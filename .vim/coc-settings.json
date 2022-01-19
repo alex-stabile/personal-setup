@@ -1,0 +1,12 @@
+{
+  "eslint.autoFixOnSave": false,
+  "eslint.filetypes": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "tsserver.formatOnType": false,
+  "coc.preferences.formatOnType": false,
+  "list.normalMappings": {
+    "<C-c>": "do:exit"
+  },
+  "list.insertMappings": {
+    "<C-c>": "do:exit"
+  }
+}
