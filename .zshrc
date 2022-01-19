@@ -49,25 +49,27 @@ source <(kubectl completion zsh)
 # TODO: ORGANIZE
 # ------------------------------------------------------------
 
+AZ_IP="51.143.63.42"
+
 devsh() {
-  ssh -i ~/.ssh/id_rsa alex@51.143.63.42
+  ssh -i ~/.ssh/id_rsa "alex@${AZ_IP}"
 }
 
 devtunnel() {
-  ssh -i ~/.ssh/id_rsa -L 3000:0.0.0.0:3000 alex@51.143.63.42
+  ssh -i ~/.ssh/id_rsa -L 3000:0.0.0.0:3000 "alex@${AZ_IP}"
 }
 
 devtunnelotel() {
   ssh -i ~/.ssh/id_rsa \
     -L 3000:0.0.0.0:3000 \
     -L 9411:0.0.0.0:9411 \
-    alex@51.143.63.42
+    "alex@${AZ_IP}"
 }
 
 devcp() {
   local src="$1"
   local dest="$2"
-  scp -i ~/.ssh/id_rsa "$src" "alex@51.143.63.42:$dest"
+  scp -i ~/.ssh/id_rsa "$src" "alex@${AZ_IP}:$dest"
 }
 
 # bat with useful params for logs, reads from stdin
