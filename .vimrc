@@ -3,7 +3,6 @@ call plug#begin('~/.vim/plugged')
 Plug 'tmux-plugins/vim-tmux-focus-events'
 
 Plug 'phanviet/vim-monokai-pro'
-Plug 'ghifarit53/tokyonight-vim'
 
 Plug 'pangloss/vim-javascript'
 Plug 'leafgarland/typescript-vim'
@@ -17,7 +16,8 @@ Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
 
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'alex-stabile/tokyonight-vim', {'branch': 'tweaks'}
+Plug 'alex-stabile/coc.nvim', {'branch': 'hotfixes'}
 let g:coc_global_extensions = [
       \ 'coc-tsserver',
       \ 'coc-prettier',
@@ -57,21 +57,19 @@ nnoremap <silent> <space>e :<C-u>CocList diagnostics<cr>
 " holy shit
 " nnoremap <silent> <space>s :<C-u>CocList -I symbols<cr>
 
-" Enable true color!
+""
+" Colors
+"
 " Note: tmux can interfere if configured improperly. Make sure your .tmux.conf
 " contains the following settings:
 " set -g default-terminal "xterm-256color" # (or screen)
 
-" # Tc allows vim to enable true colors, sitm allows vim to use italics
-" set -as terminal-overrides ',xterm*:Tc:sitm=\E[3m'
-" https://vimhelp.org/term.txt.html#xterm-true-color
-" set termguicolors
-" let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-" let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-"
-" after all that...
 set termguicolors
 set background=dark
+colorscheme tokyonight
+" Enable italics (required for Mac)
+let &t_ZH="\e[3m"
+let &t_ZR="\e[23m"
 
 " required fzf setup
 set rtp+=/usr/local/opt/fzf
