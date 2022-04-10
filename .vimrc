@@ -6,7 +6,6 @@ Plug 'phanviet/vim-monokai-pro'
 
 Plug 'pangloss/vim-javascript'
 Plug 'leafgarland/typescript-vim'
-" Plug 'HerringtonDarkholme/yats.vim'
 Plug 'peitalin/vim-jsx-typescript'
 Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 
@@ -25,10 +24,6 @@ let g:coc_global_extensions = [
   \ ]
 
 call plug#end()
-
-" for dev server
-set shell=/bin/bash
-set termguicolors
 
 " if you have that FZF issue...
 " let $FZF_DEFAULT_COMMAND = ''
@@ -54,7 +49,7 @@ nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
 " lists
 nnoremap <silent> <space>e :<C-u>CocList diagnostics<cr>
-" holy shit
+" o.O
 " nnoremap <silent> <space>s :<C-u>CocList -I symbols<cr>
 
 ""
@@ -66,10 +61,10 @@ nnoremap <silent> <space>e :<C-u>CocList diagnostics<cr>
 
 set termguicolors
 set background=dark
-colorscheme tokyonight
 " Enable italics (required for Mac)
 let &t_ZH="\e[3m"
 let &t_ZR="\e[23m"
+colorscheme tokyonight
 
 " required fzf setup
 set rtp+=/usr/local/opt/fzf
@@ -259,18 +254,6 @@ command! -bang -nargs=* Rg
 " \ '~/.vim/plugged/fzf.vim/bin/preview.sh {}'
 
 ""
-" Color stuff
-"
-
-" set monokai_pro colorscheme, with some modifications
-function! TweakMonokai()
-  set termguicolors
-  colorscheme monokai_pro
-  highlight Normal guibg=#1d1a1e
-endfunction
-
-
-""
 " Experimental test stuff
 " (not working)
 "
@@ -316,4 +299,3 @@ endfunction
 
 " TODO: fix this, it's conflicting with tabs
 " nnoremap <Leader>t :RunTest<CR>
-
