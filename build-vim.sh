@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Deps
 sudo apt install ncurses-dev
 sudo apt install make
