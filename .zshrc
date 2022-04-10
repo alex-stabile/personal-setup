@@ -1,14 +1,19 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # ------------------------------------------------------------
 # ALIAS ETC
 # (need to organize)
 # ------------------------------------------------------------
 
 alias ls="ls -G"
-# alias tmux="tmux -2"
 alias v="vim"
 alias scripts="cat package.json | jq '.scripts'"
 alias tree="tree -aC"
-# pipe something to me to copy!
 alias clipboard="pbcopy"
 
 # git shortcuts:
@@ -24,10 +29,18 @@ alias weather="curl wttr.in/SanFrancisco"
 # Default prompt (from /private/etc/zshrc)
 PS1="%n@%m %1~ %# "
 
-# kube zsh!
-autoload -Uz compinit
-compinit
-source <(kubectl completion zsh)
+# Colors (from default bashrc)
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    #alias dir='dir --color=auto'
+    #alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
 
 # add GNU grep to path
 # PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
@@ -49,7 +62,7 @@ source <(kubectl completion zsh)
 # TODO: ORGANIZE
 # ------------------------------------------------------------
 
-AZ_IP="51.143.63.42"
+AZ_IP="$(cat .devbox_ip)"
 
 devsh() {
   ssh -i ~/.ssh/id_rsa "alex@${AZ_IP}"
@@ -148,16 +161,27 @@ flog() {
   git log --color=always --pretty=format:'%h %Cgreen%al%Cred%d %Creset%s' | fzf --preview 'git show --color=always {+1}'
 }
 
-# ------------------------------------------------------------
-# PATH
-# ------------------------------------------------------------
-
 # Add FZF
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Add retool-sh
+export RETOOL_SH_DIR='/Users/alexander/Developer/retool-sh'
+. "$RETOOL_SH_DIR/retoolrc"
+
+# ZSH config
+autoload -Uz compinit
+compinit
+bindkey "^[[A" history-beginning-search-backward # prefix history search thing
+if command -v kubectl &> /dev/null
+then
+  source <(kubectl completion zsh)
+fi
+source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /home/linuxbrew/.linuxbrew/opt/powerlevel10k/powerlevel10k.zsh-theme
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # Add NVM
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-export RETOOL_SH_DIR='/Users/alexander/Developer/retool-sh'
-. "$RETOOL_SH_DIR/retoolrc"
+# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
