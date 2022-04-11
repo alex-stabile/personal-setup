@@ -90,6 +90,11 @@ logbat() {
   bat --paging=never --decorations=never -l log
 }
 
+start_ssh() {
+  eval $(ssh-agent)
+  echo "now do the ssh-add thing"
+}
+
 # Other params:
 # osascript -e 'display notification "hello world!" with title "Greeting" subtitle "More text" sound name "Submarine"'
 # First arg: title
