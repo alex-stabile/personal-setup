@@ -21,7 +21,10 @@ alias gs='git status'
 alias gd='git diff'
 alias ga='git add'
 alias gb='git branch --show-current'
+alias gcm='git commit -m'
 alias prettylog='git log -n 10 --pretty=oneline'
+
+alias tat='tmux attach-session -t'
 
 # weather cuz why not
 alias weather="curl wttr.in/SanFrancisco"
@@ -44,6 +47,13 @@ fi
 
 # add GNU grep to path
 # PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
+
+# Homebrew
+# wtf what do I need here for linux?
+# test -d ~/.linuxbrew && eval "$(~/.linuxbrew/bin/brew shellenv)"
+# test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# test -r ~/.bash_profile && echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.bash_profile
+# echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.profile
 
 # ------------------------------------------------------------
 # iTERM FIX
@@ -170,7 +180,8 @@ flog() {
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Add retool-sh
-export RETOOL_SH_DIR='/Users/alexander/Developer/retool-sh'
+[ -d /home/alex/dev/retool-sh ] && export RETOOL_SH_DIR='/home/alex/dev/retool-sh'
+[ -d /Users/alexander/Developer/retool-sh ] && export RETOOL_SH_DIR='/Users/alexander/Developer/retool-sh'
 . "$RETOOL_SH_DIR/retoolrc"
 
 # ZSH config
