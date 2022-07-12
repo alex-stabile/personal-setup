@@ -32,6 +32,8 @@ alias weather="curl wttr.in/SanFrancisco"
 # Default prompt (from /private/etc/zshrc)
 PS1="%n@%m %1~ %# "
 
+test -d /usr/lib/jvm && export JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64
+
 # Colors (from default bashrc)
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -51,7 +53,7 @@ fi
 # Homebrew
 # wtf what do I need here for linux?
 # test -d ~/.linuxbrew && eval "$(~/.linuxbrew/bin/brew shellenv)"
-# test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 # test -r ~/.bash_profile && echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.bash_profile
 # echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.profile
 
@@ -201,3 +203,24 @@ source ~/.zsh/powerlevel10k/powerlevel10k.zsh-theme
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 # [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# Call nvm use automatically in a directory with a .nvmrc
+autoload -U add-zsh-hook
+load-nvmrc() {
+  local node_version="$(nvm version)"
+  local nvmrc_path="$(nvm_find_nvmrc)"
+
+  if [ -n "$nvmrc_path" ]; then
+    local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
+
+    if [ "$nvmrc_node_version" = "N/A" ]; then
+      nvm install
+    elif [ "$nvmrc_node_version" != "$node_version" ]; then
+      nvm use
+    fi
+  elif [ "$node_version" != "$(nvm version default)" ]; then
+    echo "Reverting to nvm default version"
+    nvm use default
+  fi
+}
+add-zsh-hook chpwd load-nvmrc
+load-nvmrc
