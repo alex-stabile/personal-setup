@@ -80,7 +80,8 @@ set expandtab	" always insert spaces instead of tabs
 set number	" turn on line numbers
 set cursorline	" highlight current line (da best)
 set wildmenu	" visual autocomplete for command menu
-set showmatch	" highlight matching [{()}]
+set noshowmatch	" highlight matching [{()}]
+set redrawtime=5000
 set visualbell  " use visual bell instead of beeping
 set scrolloff=10 " number of lines to keep above and below the cursor
 " Sensible line wrapping:
