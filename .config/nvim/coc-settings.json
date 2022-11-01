@@ -1,0 +1,10 @@
+{
+  "eslint.packageManager": "yarn",
+  "eslint.workingDirectories": [
+    "./backend",
+    "./frontend",
+    "./mobile",
+    "./packages/runtimeShared",
+    "./packages/runtime"
+  ]
+}
