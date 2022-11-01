@@ -184,7 +184,7 @@ flog() {
 # Add retool-sh
 [ -d /home/alex/dev/retool-sh ] && export RETOOL_SH_DIR='/home/alex/dev/retool-sh'
 [ -d /Users/alexander/Developer/retool-sh ] && export RETOOL_SH_DIR='/Users/alexander/Developer/retool-sh'
-. "$RETOOL_SH_DIR/retoolrc"
+[ -n "$RETOOL_SH_DIR" ] && . "$RETOOL_SH_DIR/retoolrc"
 
 # ZSH config
 autoload -Uz compinit
