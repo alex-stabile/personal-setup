@@ -16,14 +16,19 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
 
 Plug 'alex-stabile/tokyonight-vim', {'branch': 'tweaks'}
-Plug 'alex-stabile/coc.nvim', {'branch': 'hotfixes'}
-let g:coc_global_extensions = [
-      \ 'coc-tsserver',
-      \ 'coc-prettier',
-      \ 'coc-eslint'
-  \ ]
+
+" Plug 'alex-stabile/coc.nvim', {'branch': 'hotfixes'}
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 call plug#end()
+
+let g:coc_global_extensions = [
+    \ 'coc-tsserver',
+    \ 'coc-prettier',
+    \ 'coc-eslint',
+    \ 'coc-json'
+\ ]
+
 
 " if you have that FZF issue...
 " let $FZF_DEFAULT_COMMAND = ''
@@ -33,7 +38,11 @@ call plug#end()
 " CoC stuff
 "
 " bug: need to call s:reset() in coc/prompt.vim:s:start_prompt()
-" let g:coc_disable_transparent_cursor = 0
+" see: https://github.com/neoclide/coc.nvim/issues/1775
+let g:coc_disable_transparent_cursor = 1
+" also did:
+" set guicursor+=a:ver1-Cursor/lCursor
+" set guicursor+=n-v-c:block-Cursor
 if v:version < 802
   let g:coc_disable_startup_warning = 1
   let g:coc_start_at_startup = 0
@@ -141,8 +150,7 @@ set shortmess-=S
 " Filetype/syntax configs
 "
 filetype plugin on
-" JSON - use javascript parsing
-autocmd BufNewFile,BufRead *.json set ft=javascript
+autocmd BufNewFile,BufRead *.json set ft=jsonc
 " use shell highlighting for files with no extension
 autocmd BufNewFile,BufRead * if &ft == '' | set ft=sh | endif
 autocmd BufNewFile,BufRead * if &syntax == '' | set syntax=sh | endif
