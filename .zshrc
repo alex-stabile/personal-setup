@@ -32,8 +32,6 @@ alias weather="curl wttr.in/SanFrancisco"
 # Default prompt (from /private/etc/zshrc)
 PS1="%n@%m %1~ %# "
 
-test -d /usr/lib/jvm && export JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64
-
 # Colors (from default bashrc)
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -47,8 +45,17 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
-# add GNU grep to path
-# PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
+# --------
+# Retool repo setup
+# --------
+if [ "$(uname)" = "Darwin" ]; then
+  export PATH="/usr/local/opt/openjdk/libexec/openjdk.jdk/Contents/Home/bin:$PATH"
+  export JAVA_HOME=`/usr/libexec/java_home`
+  # M1 macs only (to fix node-odbc dependency)
+  export LDFLAGS="-L/opt/homebrew/opt/unixodbc/lib"
+  export CPPFLAGS="-I/opt/homebrew/opt/unixodbc/include"
+fi
+# test -d /usr/lib/jvm && export JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64
 
 # Homebrew
 # wtf what do I need here for linux?
@@ -185,6 +192,8 @@ flog() {
 [ -d /home/alex/dev/retool-sh ] && export RETOOL_SH_DIR='/home/alex/dev/retool-sh'
 [ -d /Users/alexander/Developer/retool-sh ] && export RETOOL_SH_DIR='/Users/alexander/Developer/retool-sh'
 [ -n "$RETOOL_SH_DIR" ] && . "$RETOOL_SH_DIR/retoolrc"
+# install correct grep for retool-sh
+[ -n "$RETOOL_SH_DIR" ] && PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
 
 # ZSH config
 autoload -Uz compinit
@@ -224,3 +233,9 @@ load-nvmrc() {
 }
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/alexander/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/alexander/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/alexander/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/alexander/google-cloud-sdk/completion.zsh.inc'; fi
