@@ -81,7 +81,7 @@ test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/bre
 # TODO: ORGANIZE
 # ------------------------------------------------------------
 
-AZ_IP="$(cat .devbox_ip)"
+test -r ~/.devbox_ip && export AZ_IP="$(cat ~/.devbox_ip)"
 
 devsh() {
   ssh -i ~/.ssh/id_rsa "alex@${AZ_IP}"
