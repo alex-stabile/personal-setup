@@ -83,6 +83,10 @@ test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/bre
 
 test -r ~/.devbox_ip && export AZ_IP="$(cat ~/.devbox_ip)"
 
+setdisplays() {
+  displayplacer "id:09AB8CAB-6950-4F4B-A1EC-7FE88BDAC82C res:2560x1440 hz:60 color_depth:8 scaling:on origin:(0,0) degree:0" "id:0E1A97FC-530E-4647-A9D1-FE84277A7F16 res:2560x1440 hz:60 color_depth:8 scaling:on origin:(-2560,0) degree:0"
+}
+
 devsh() {
   ssh -i ~/.ssh/id_rsa "alex@${AZ_IP}"
 }
@@ -112,6 +116,10 @@ logbat() {
 start_ssh() {
   eval $(ssh-agent)
   echo "now do the ssh-add thing"
+}
+
+fix_submodules() {
+  git submodule deinit -f . && git submodule update --init
 }
 
 # Other params:
@@ -239,3 +247,9 @@ if [ -f '/Users/alexander/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/alexa
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/alexander/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/alexander/google-cloud-sdk/completion.zsh.inc'; fi
+
+# Kubernetes thing for Garden setup
+export PATH="/opt/homebrew/opt/kubernetes-cli/bin:$PATH"
+
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /opt/homebrew/bin/terraform terraform
