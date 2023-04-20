@@ -223,6 +223,7 @@ nnoremap <Leader>d :bdelete<CR>
 nnoremap <Leader>b :Buffers<CR>
 " FZF: files (no CR to narrow down)
 nnoremap <Leader>f :Files 
+nnoremap <Leader>r :Rg
 " reload current file because sometimes there are weird syntax issues?
 nnoremap <Leader><Space> :edit %<CR>
 " easier find word under cursor - use 'n' to mimic search next
@@ -235,6 +236,8 @@ nnoremap <leader>? :echo @%<cr>
 nnoremap <leader>c ciw
 " easier vsplit (and navigate to new split)
 nnoremap <leader>v :vsplit<cr><c-w>l
+" fix syntax issues
+nnoremap <leader>s :syntax sync fromstart<CR>
 
 ""
 " FZF Config
