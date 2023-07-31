@@ -16,6 +16,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
 
 Plug 'alex-stabile/tokyonight-vim', {'branch': 'tweaks'}
+Plug 'morhetz/gruvbox'
 
 " Plug 'alex-stabile/coc.nvim', {'branch': 'hotfixes'}
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
@@ -73,7 +74,10 @@ set background=dark
 " Enable italics (required for Mac)
 let &t_ZH="\e[3m"
 let &t_ZR="\e[23m"
-colorscheme tokyonight
+
+" soft, medium, hard; default: medium
+let g:gruvbox_contrast_dark = "hard"
+colorscheme gruvbox
 
 " required fzf setup
 set rtp+=/usr/local/opt/fzf
@@ -223,7 +227,8 @@ nnoremap <Leader>d :bdelete<CR>
 nnoremap <Leader>b :Buffers<CR>
 " FZF: files (no CR to narrow down)
 nnoremap <Leader>f :Files 
-nnoremap <Leader>r :Rg
+nnoremap <Leader>r :Rg 
+nnoremap <Leader>e :Explore<CR>
 " reload current file because sometimes there are weird syntax issues?
 nnoremap <Leader><Space> :edit %<CR>
 " easier find word under cursor - use 'n' to mimic search next
@@ -238,6 +243,10 @@ nnoremap <leader>c ciw
 nnoremap <leader>v :vsplit<cr><c-w>l
 " fix syntax issues
 nnoremap <leader>s :syntax sync fromstart<CR>
+" copy current filename to clipboard
+nnoremap <leader>F
+  \ :let @" = expand("%")<CR>
+  \ y:call system('pbcopy', @")<CR>
 
 ""
 " FZF Config
