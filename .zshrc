@@ -56,6 +56,8 @@ if [ "$(uname)" = "Darwin" ]; then
   export CPPFLAGS="-I/opt/homebrew/opt/unixodbc/include"
 fi
 # test -d /usr/lib/jvm && export JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64
+alias yarn="echo Reminder: use pnpm!"
+
 
 # Homebrew
 # wtf what do I need here for linux?
@@ -188,6 +190,14 @@ fco() {
     git checkout $(echo "$branch" | sed "s/.* //")
 }
 
+# fuzzy search a job to foreground
+fj() {
+  local joblines jobnum
+  joblines=$(jobs | fzf +m --layout=reverse --info=inline-right --border --height=10% --preview="") &&
+    jobnum=$(echo "$joblines" | sed -nr "s/\[([0-9]+).*$/\1/p") &&
+    fg "%$jobnum"
+}
+
 # flog - git log with fzf
 flog() {
   git log --color=always --pretty=format:'%h %Cgreen%al%Cred%d %Creset%s' | fzf --preview 'git show --color=always {+1}'
@@ -206,6 +216,8 @@ flog() {
 # ZSH config
 autoload -Uz compinit
 compinit
+# disable git autocompletion because it lags when completing files
+compdef -d git
 bindkey "^[[A" history-beginning-search-backward # prefix history search thing
 if command -v kubectl &> /dev/null
 then
@@ -253,3 +265,7 @@ export PATH="/opt/homebrew/opt/kubernetes-cli/bin:$PATH"
 
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /opt/homebrew/bin/terraform terraform
+export RETOOL_SH_DIR='/Users/astabile/Developer/retool-sh'
+export BOLD=false
+export UNDERLINE=false
+. "$RETOOL_SH_DIR/retoolrc"
