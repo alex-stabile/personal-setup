@@ -19,12 +19,16 @@ local function on_attach(client)
     client.server_capabilities.semanticTokensProvider = nil
     -- Disable formatting to avoid conflict with prettier
     client.server_capabilities.documentFormattingProvider = false
+    -- no `implementationProvider` responses from this LSP to avoid conflicting with css modules
+    -- (use definition instead)
+    client.server_capabilities.implementationProvider = false
   end
   -- Default, see: https://github.com/neovim/neovim/issues/26078
   vim.diagnostic.config{ update_in_insert = false }
   vim.opt.signcolumn = 'yes' -- Always show gutter to avoid thrash
 
   vim.keymap.set('n','gd','<cmd>lua vim.lsp.buf.definition()<CR>')
+  vim.keymap.set('n','gi','<cmd>lua vim.lsp.buf.implementation()<CR>')
   vim.keymap.set('n','K','<cmd>lua vim.lsp.buf.hover()<CR>')
   vim.keymap.set('n','gr','<cmd>References<CR>')
   vim.keymap.set('n','gR','<cmd>lua vim.lsp.buf.references()<CR>')
@@ -125,6 +129,16 @@ require'lspconfig'.eslint.setup{
     packageManager = 'pnpm',
     execArgv = '--max-old-space-size=8192',
   },
+}
+
+-- npm i -g cssmodules-language-server
+-- Go to definition, hover for cssmodules referenced in JS
+require'lspconfig'.cssmodules_ls.setup{
+  on_attach = function (client)
+    -- no `definitionProvider` responses from this LSP to avoid conflicting with TS
+    client.server_capabilities.definitionProvider = false
+    on_attach(client)
+  end,
 }
 
 -- Set up formatting
