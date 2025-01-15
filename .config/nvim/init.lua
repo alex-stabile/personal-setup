@@ -4,10 +4,17 @@ vim.opt.packpath = vim.opt.runtimepath:get()
 vim.cmd('source ~/.vimrc')
 
 local on_attach = function(client)
-  print(
-    "LSP client attached:",
-    client.name .. "@" .. vim.lsp.buf.list_workspace_folders()[1]
-  )
+  local workspace = vim.lsp.buf.list_workspace_folders()[1]
+  if workspace ~= nil then
+    print(
+      "LSP client attached:",
+      client.name .. "@" .. workspace
+    )
+  else
+    print("LSP client attached:", client.name)
+  end
+
+  client.server_capabilities.semanticTokensProvider = nil
   if client.name == 'ts_ls' then
     -- Disable LSP's syntax highlighting
     client.server_capabilities.semanticTokensProvider = nil
@@ -55,6 +62,47 @@ cmp.setup({
 
 -- Set up language servers
 -- vim.lsp.set_log_level('debug') -- Include logs from attached language servers
+
+-- npm i -g bash-language-server
+require'lspconfig'.bashls.setup{
+  on_attach = on_attach,
+  filetypes = { 'bash', 'sh', 'zsh' },
+}
+
+-- brew install lua-language-server
+require'lspconfig'.lua_ls.setup{
+  on_attach = on_attach,
+  -- Make the server aware of plugins and other runtime files
+  -- See: https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#lua_ls
+  on_init = function(client)
+    if client.workspace_folders then
+      local path = client.workspace_folders[1].name
+      if vim.loop.fs_stat(path..'/.luarc.json') or vim.loop.fs_stat(path..'/.luarc.jsonc') then
+        return
+      end
+    end
+    client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+      runtime = {
+        version = 'LuaJIT' -- Neovim uses LuaJIT
+      },
+      workspace = {
+        checkThirdParty = false,
+        library = {
+          vim.env.VIMRUNTIME
+        }
+      }
+    })
+  end,
+  settings = {
+    Lua = {}
+  }
+}
+
+-- npm i -g vim-language-server
+require'lspconfig'.vimls.setup{
+  on_attach = on_attach
+}
+
 local capabilities = require'cmp_nvim_lsp'.default_capabilities()
 require'lspconfig'.ts_ls.setup{
   on_attach = on_attach,
