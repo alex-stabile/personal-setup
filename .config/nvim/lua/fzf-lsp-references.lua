@@ -6,7 +6,7 @@ local function fzf_run(opts)
   vim.fn['fzf#run'](vim.fn['fzf#wrap'](opts))
 end
 
-local function str_from_loc(loc, include_filename)
+local function str_from_loc(loc)
   return vim.fn.fnamemodify(loc['filename'], ':p:~:.')
     .. ":"
     .. loc["lnum"]
@@ -33,9 +33,8 @@ local function handle_sinklist(e)
 end
 
 local function on_list(options)
-  vim.notify('Got '..table.getn(options.items)..' locations')
+  vim.notify('Got '..vim.tbl_count(options.items)..' locations')
   local items = options.items
-  local str = str_from_loc(items[1])
 
   local list = {}
   for _, loc in ipairs(items) do
