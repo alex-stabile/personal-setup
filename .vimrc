@@ -29,6 +29,9 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 call plug#end()
 
+" dual caps lock map keyboard mod:
+" https://gist.github.com/tanyuan/55bca522bf50363ae4573d4bdcf06e2e?permalink_comment_id=4271644#macos
+
 ""
 " CoC config
 " Settings in: ~/.config/nvim/coc-settings.json
