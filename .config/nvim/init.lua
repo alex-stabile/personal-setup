@@ -69,7 +69,7 @@ cmp.setup({
 -- npm i -g bash-language-server
 require'lspconfig'.bashls.setup{
   on_attach = on_attach,
-  filetypes = { 'bash', 'sh', 'zsh' },
+  filetypes = { 'bash', 'zsh' },
 }
 
 -- brew install lua-language-server
