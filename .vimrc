@@ -237,8 +237,8 @@ let g:fzf_action = {
 
 let window = { 'width': 0.9, 'height': 0.8 }
 let common_opts = [ '--layout=reverse', '--info=inline' ]
-let preview_file = 'bat --color=always --theme=gruvbox-dark --style=header,grid {}'
-let preview_line= 'bat --color=always --theme=gruvbox-dark --style=header,grid {1} --highlight-line {2}'
+let preview_file = 'bat --color=always --theme=gruvbox-dark --style=numbers,header,grid {}'
+let preview_line= 'bat --color=always --theme=gruvbox-dark --style=numbers,header,grid {1} --highlight-line {2}'
 
 command! -bang -nargs=? -complete=dir Files
   \ call fzf#vim#files(

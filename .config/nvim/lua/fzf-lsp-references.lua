@@ -40,7 +40,7 @@ local function on_list(options)
   for _, loc in ipairs(items) do
     table.insert(list, str_from_loc(loc))
   end
-  local preview_cmd = 'bat --color=always --theme=gruvbox-dark --style=header,grid {1} --highlight-line {2}'
+  local preview_cmd = 'bat --color=always --theme=gruvbox-dark --style=numbers,header,grid {1} --highlight-line {2}'
   fzf_run({
     sinklist = handle_sinklist,
     source = list,
