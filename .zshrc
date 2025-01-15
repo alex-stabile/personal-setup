@@ -5,10 +5,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# ------------------------------------------------------------
-# ALIAS ETC
-# (need to organize)
-# ------------------------------------------------------------
+# Aliases
 
 alias ls="ls -G"
 alias v="vim"
@@ -16,7 +13,7 @@ alias scripts="cat package.json | jq '.scripts'"
 alias tree="tree -aC"
 alias clipboard="pbcopy"
 
-# git shortcuts:
+# git shortcuts
 alias gs='git status'
 alias gd='git diff'
 alias ga='git add'
@@ -26,7 +23,6 @@ alias prettylog='git log -n 10 --pretty=oneline'
 
 alias tat='tmux attach-session -t'
 
-# weather cuz why not
 alias weather="curl wttr.in/SanFrancisco"
 
 # Default prompt (from /private/etc/zshrc)
@@ -35,55 +31,20 @@ PS1="%n@%m %1~ %# "
 # Colors (from default bashrc)
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
+  test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+  alias ls='ls --color=auto'
+  #alias dir='dir --color=auto'
+  #alias vdir='vdir --color=auto'
 
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
+  alias grep='grep --color=auto'
+  alias fgrep='fgrep --color=auto'
+  alias egrep='egrep --color=auto'
 fi
-
-# --------
-# Retool repo setup
-# --------
-if [ "$(uname)" = "Darwin" ]; then
-  export PATH="/usr/local/opt/openjdk/libexec/openjdk.jdk/Contents/Home/bin:$PATH"
-  export JAVA_HOME=`/usr/libexec/java_home`
-  # M1 macs only (to fix node-odbc dependency)
-  export LDFLAGS="-L/opt/homebrew/opt/unixodbc/lib"
-  export CPPFLAGS="-I/opt/homebrew/opt/unixodbc/include"
-fi
-# test -d /usr/lib/jvm && export JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64
-alias yarn="echo Reminder: use pnpm!"
-
 
 # Homebrew
-# wtf what do I need here for linux?
-# test -d ~/.linuxbrew && eval "$(~/.linuxbrew/bin/brew shellenv)"
 test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-# test -r ~/.bash_profile && echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.bash_profile
-# echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.profile
 
-# ------------------------------------------------------------
-# iTERM FIX
-# ------------------------------------------------------------
-
-# Fix keys for iTerm, see key mappings
-# in Preferences -> Profiles -> Keys
-# not necessary with "natural key binding" preset
-# bindkey "^[[1~" beginning-of-line # Home
-# bindkey "^[[4~" end-of-line # End
-# bindkey "^[[1;5C" forward-word # Option-Right
-# bindkey "^[[1;5D" backward-word # Option-Left
-
-# ------------------------------------------------------------
-# RANDOM
-# TODO: ORGANIZE
-# ------------------------------------------------------------
-
-test -r ~/.devbox_ip && export AZ_IP="$(cat ~/.devbox_ip)"
+# Functions
 
 setdisplays() {
   displayplacer "id:09AB8CAB-6950-4F4B-A1EC-7FE88BDAC82C res:2560x1440 hz:60 color_depth:8 scaling:on origin:(0,0) degree:0" "id:0E1A97FC-530E-4647-A9D1-FE84277A7F16 res:2560x1440 hz:60 color_depth:8 scaling:on origin:(-2560,0) degree:0"
@@ -117,7 +78,7 @@ logbat() {
 
 start_ssh() {
   eval $(ssh-agent)
-  echo "now do the ssh-add thing"
+  echo "now do ssh-add"
 }
 
 fix_submodules() {
@@ -141,19 +102,17 @@ $@
   echo $msg
 }
 
-# ------------------------------------------------------------
-# FZF setup
-# ------------------------------------------------------------
+# FZF config
 
 local preview_bind="ctrl-d:preview-page-down,ctrl-e:preview-down,ctrl-u:preview-page-up,ctrl-y:preview-up"
 export FZF_DEFAULT_OPTS="--ansi --bind=$preview_bind"
-
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# Example to preview file or folder:
+# Example command to preview file or folder:
 # --preview="(bat --color=always --style=header,grid --line-range :300 {} || tree -aC -L 1 {}) 2>/dev/null"
 
-# fd - cd to selected directory
+# Custom FZF functions
+
+# cd to selected directory
 # Inspired by: https://github.com/junegunn/fzf/wiki/examples
 fd() {
   local dir
@@ -165,7 +124,7 @@ fd() {
     && cd "$dir"
 }
 
-# fdr - cd to parent directory
+# cd to parent directory
 # Note: on mac must install coreutils for realpath
 fdr() {
   local declare dirs=()
@@ -181,8 +140,7 @@ fdr() {
   cd "$DIR"
 }
 
-# fco - interactive git checkout
-# this one is lit
+# interactive git checkout
 fco() {
   local branches branch previewcmd
   previewcmd="git --no-pager log -50 --color=always --pretty=format:'%Cgreen%h%Cred %al%Creset %s' {1}"
@@ -199,20 +157,13 @@ fj() {
     fg "%$jobnum"
 }
 
-# flog - git log with fzf
+# git log (preview commits)
 flog() {
   git log --color=always --pretty=format:'%h %Cgreen%al%Cred%d %Creset%s' | fzf --preview 'git show --color=always {+1}'
 }
 
-
-# Add retool-sh
-[ -d /home/alex/dev/retool-sh ] && export RETOOL_SH_DIR='/home/alex/dev/retool-sh'
-[ -d /Users/alexander/Developer/retool-sh ] && export RETOOL_SH_DIR='/Users/alexander/Developer/retool-sh'
-[ -n "$RETOOL_SH_DIR" ] && . "$RETOOL_SH_DIR/retoolrc"
-# install correct grep for retool-sh
-[ -n "$RETOOL_SH_DIR" ] && PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
-
 # ZSH config
+
 autoload -Uz compinit
 compinit
 # disable git autocompletion because it lags when completing files
@@ -226,6 +177,14 @@ source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.zsh/powerlevel10k/powerlevel10k.zsh-theme
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# Your employer
+
+if [ -f ~/.retoolrc ]; then
+  source ~/.retoolrc
+else
+  echo ".retoolrc not found"
+fi
 
 # Add NVM
 export NVM_DIR="$HOME/.nvm"
@@ -253,21 +212,14 @@ load-nvmrc() {
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 
-# The next line updates PATH for the Google Cloud SDK.
+# update PATH for the Google Cloud SDK.
 if [ -f '/Users/alexander/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/alexander/google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
+# shell command completion for gcloud.
 if [ -f '/Users/alexander/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/alexander/google-cloud-sdk/completion.zsh.inc'; fi
 
-# Kubernetes thing for Garden setup
 export PATH="/opt/homebrew/opt/kubernetes-cli/bin:$PATH"
-
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /opt/homebrew/bin/terraform terraform
-export RETOOL_SH_DIR='/Users/astabile/Developer/retool-sh'
-export BOLD=false
-export UNDERLINE=false
-. "$RETOOL_SH_DIR/retoolrc"
-alias pnpm-switch="ls pnpm-lock.yaml &>/dev/null && corepack prepare --activate pnpm@\$(jq -r .devDependencies.pnpm < package.json) || echo Move to root of retool_development"
+
 export JAVA_HOME="$(/usr/libexec/java_home)"
 export PATH="${JAVA_HOME}/bin:$PATH"
