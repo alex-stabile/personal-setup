@@ -221,8 +221,8 @@ nnoremap <leader>F
 nnoremap <Leader>m :messages<CR>
 " FZF commands
 nnoremap <Leader>b :Buffers<CR>
-nnoremap <Leader>f :Files
-nnoremap <Leader>r :Rg
+nnoremap <Leader>f :Files<Space>
+nnoremap <Leader>r :Rg<Space>
 
 ""
 " FZF Config
