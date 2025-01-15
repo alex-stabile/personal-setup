@@ -25,30 +25,21 @@ Plug 'tpope/vim-rhubarb'
 Plug 'alex-stabile/tokyonight-vim', {'branch': 'tweaks'}
 Plug 'morhetz/gruvbox'
 
-" Plug 'alex-stabile/coc.nvim', {'branch': 'hotfixes'}
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 call plug#end()
 
+""
+" CoC config
+" Settings in: ~/.config/nvim/coc-settings.json
 let g:coc_start_at_startup = 0
-
 let g:coc_global_extensions = [
     \ 'coc-tsserver',
     \ 'coc-prettier',
     \ 'coc-eslint',
     \ 'coc-json'
 \ ]
-
-
-let use_coc = !has('nvim')
-""
-" CoC stuff
-"
-" bug: need to call s:reset() in coc/prompt.vim:s:start_prompt()
-" see: https://github.com/neoclide/coc.nvim/issues/1775
-"
-" Settings here: ~/.config/nvim/coc-settings.json
-if use_coc
+if !has('nvim')
   let g:coc_disable_transparent_cursor = 1
   " also did:
   " set guicursor+=a:ver1-Cursor/lCursor
@@ -77,9 +68,8 @@ endif
 ""
 " Colors
 "
-" Note: tmux can interfere if configured improperly. Make sure your .tmux.conf
-" contains the following settings:
-" set -g default-terminal "xterm-256color" # (or screen)
+" Make sure .tmux.conf includes:
+" set -g default-terminal "xterm-256color"
 
 set termguicolors
 set background=dark
@@ -87,7 +77,7 @@ set background=dark
 let &t_ZH="\e[3m"
 let &t_ZR="\e[23m"
 
-" soft, medium, hard; default: medium
+" See: https://github.com/morhetz/gruvbox/wiki/Configuration#ggruvbox_contrast_dark
 let g:gruvbox_contrast_dark = "hard"
 colorscheme gruvbox
 
@@ -96,7 +86,7 @@ colorscheme gruvbox
 " Good resources:
 " - http://stevelosh.com/blog/2010/09/coming-home-to-vim/#important-vimrc-lines
 " - https://dougblack.io/words/a-good-vimrc.html
-"
+
 set noshowmode
 set expandtab	" always insert spaces instead of tabs
 set number	" turn on line numbers
@@ -110,8 +100,26 @@ set scrolloff=10 " number of lines to keep above and below the cursor
 set breakindent
 set breakindentopt=sbr " show showbreak char before applying indent
 set showbreak=↪ " unicode curly
-" set mouse=a
-" Use cursorline in active window
+set nostartofline
+" Autocomplete : commands and show the last command
+set wildmenu
+set showcmd
+" Searching
+set hlsearch
+set ignorecase
+set smartcase
+" Backspace will go to last indent instead of a single space
+set backspace=indent,eol,start
+set number
+set ruler
+" Always display last command and use a second line
+set laststatus=2
+set cmdheight=2
+set confirm
+" remove S from shortmess flags: this will display number of matches in
+" message area when searching (e.g. "[1/3]")
+set shortmess-=S
+" Show cursorline in active window only
 augroup CursorLine
     autocmd!
     autocmd WinEnter,FocusGained,BufEnter * set cursorline
@@ -125,42 +133,9 @@ augroup RelativeNum
     autocmd WinEnter,FocusGained,BufRead * if index(blacklist, &ft) < 0 | set number relativenumber | endif
     autocmd WinLeave,FocusLost * if index(blacklist, &ft) < 0 | set number norelativenumber | endif
 augroup END
-" Allow having multiple files open and page through them with :bp and :bn.
-" When switching files, preserve cursor location
-" set hidden
-set nostartofline
-" Autocomplete : commands and show the last command
-set wildmenu
-set showcmd
-" highlight search results and do case-insesitive searching except when
-" including a capital
-set hlsearch
-set ignorecase
-set smartcase
-" Backspace will go to last indent instead of a single space
-set backspace=indent,eol,start
-" Show line number on left and current location in bottom right
-" Alternatively, manually set status line to display above info, see :help
-" statusline
-" statusline=%<%f\ %h%r%=%-14.(%l,%c%V%)\ %P
-" With a cool highlight color, git branch placeholder
-" (but how to switch when not active?)
-" statusline=%<%#PmenuSel#(Master)%f\ %h%r%=%-14.(%l,%c%V%)\ %P
-" Useful statusline help:
-" https://shapeshed.com/vim-statuslines/
-set number
-set ruler
-" Always display last command and use a second line
-set laststatus=2
-set cmdheight=2
-" require confirmation for various things
-set confirm
-" remove S from shortmess flags: this will display number of matches in
-" message area when searching (e.g. "[1/3]")
-set shortmess-=S
 
 ""
-" Filetype/syntax configs
+" Filetype/syntax config
 "
 filetype plugin on
 autocmd BufNewFile,BufRead *.json set ft=jsonc
@@ -203,18 +178,6 @@ vnoremap y y:call system('pbcopy', @")<CR>
 " Resource: https://sheerun.net/2014/03/21/how-to-boost-your-vim-productivity/
 "
 
-" TEST
-function! SynStack()
-  if !exists("*synstack")
-    return
-  endif
-  echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
-endfunc
-function! SynGroup()
-  let l:s = synID(line('.'), col('.'), 1)
-  echo synIDattr(l:s, 'name') . ' -> ' . synIDattr(synIDtrans(l:s), 'name')
-endfun
-
 let mapleader = "\<Space>"
 function! ToggleHighlight()
   if &hlsearch==1
@@ -232,15 +195,10 @@ nnoremap <Leader>w :w<CR>
 nnoremap <Leader>q :q<CR>
 " drop buffer easily
 nnoremap <Leader>d :bdelete<CR>
-" FZF: buffers
-nnoremap <Leader>b :Buffers<CR>
-" FZF: files (no CR to narrow down)
-nnoremap <Leader>f :Files
-nnoremap <Leader>r :Rg
 nnoremap <Leader>e :Explore<CR>
-" reload current file because sometimes there are weird syntax issues?
+" reload current file
 nnoremap <Leader><Space> :edit %<CR>
-" easier find word under cursor - use 'n' to mimic search next
+" find word under cursor
 nnoremap <leader>n *
 " jump to match motion
 nnoremap <leader>m %
@@ -258,42 +216,26 @@ nnoremap <leader>F
   \ y:call system('pbcopy', @")<CR>
 " logs!!
 nnoremap <Leader>m :messages<CR>
+" FZF commands
+nnoremap <Leader>b :Buffers<CR>
+nnoremap <Leader>f :Files
+nnoremap <Leader>r :Rg
 
 ""
 " FZF Config
 "
 
 set rtp+=/usr/local/opt/fzf
-
 " defaults
 let g:fzf_action = {
   \ 'ctrl-t': 'tab split',
   \ 'ctrl-x': 'split',
   \ 'ctrl-v': 'vsplit' }
 
-let g:fzf_vim = {}
-let g:fzf_vim.preview_window = ['right,70%', 'ctrl-/']
-
 let window = { 'width': 0.9, 'height': 0.8 }
 let common_opts = [ '--layout=reverse', '--info=inline' ]
 let preview_file = 'bat --color=always --theme=gruvbox-dark --style=header,grid {}'
 let preview_line= 'bat --color=always --theme=gruvbox-dark --style=header,grid {1} --highlight-line {2}'
-
-" TODO: colors for previews
-let g:fzf_colors =
-\ { 'fg':      ['fg', 'Normal'],
-  \ 'bg':      ['bg', 'Normal'],
-  \ 'hl':      ['fg', 'Comment'],
-  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-  \ 'hl+':     ['fg', 'Statement'],
-  \ 'info':    ['fg', 'PreProc'],
-  \ 'border':  ['fg', 'Ignore'],
-  \ 'prompt':  ['fg', 'Conditional'],
-  \ 'pointer': ['fg', 'Exception'],
-  \ 'marker':  ['fg', 'Keyword'],
-  \ 'spinner': ['fg', 'Label'],
-  \ 'header':  ['fg', 'Comment'] }
 
 command! -bang -nargs=? -complete=dir Files
   \ call fzf#vim#files(
@@ -307,50 +249,3 @@ command! -bang -nargs=* Rg
     \ 0,
     \ {'window': window, 'options': common_opts + ['--preview', preview_line]},
     \ <bang>0 )
-
-""
-" Experimental test stuff
-" (not working)
-"
-
-function! SendTmuxCommand(pane, command)
-  return "tmux send-keys -t " . a:pane . " '" . a:command . "' Enter"
-endfunction
-
-function! RunTest()
-  " Are we in a test file?
-  " Stolen from: https://github.com/garybernhardt/dotfiles/blob/master/.vimrc
-  let in_test_file = match(expand("%"), '\(_spec.rb\|_test.rb\|test_.*\.py\|_test.py\|.test.ts\|.test.ts\)$') != -1
-
-  let pane = g:acs_test_pane
-  let example = g:acs_test_example
-
-  if in_test_file
-    " Run tests matching what example is set to
-    let test_command = "devbox rspec -- " . @% . " --example " . example
-    " Overriding for now: run tests in the scope of the current line:
-    let test_command = "devbox rspec -- " . @% . ":" . line('.')
-    " in case the pane is in copy mode
-    exec ":silent !tmux send-keys -t ".pane." -X cancel"
-    exec ":silent !" . SendTmuxCommand(pane, test_command)
-  else
-    echo "Not in test file: " . @% . " (pane=".pane.", example=".example.")"
-  end
-endfunction
-
-" Set the examples that tests will be run for
-function! SetTestExample(example_name_str)
-  let g:acs_test_example=a:example_name_str
-endfunction
-
-" Set the tmux pane that the test will run in
-function! SetTestPane(pane_index)
-  let g:acs_test_pane=a:pane_index
-endfunction
-
-" command! -nargs=1 SetTestExample call SetTestExample(<f-args>)
-" command! -nargs=1 SetTestPane  call SetTestPane(<f-args>)
-" command! RunTest call RunTest()
-
-" TODO: fix this, it's conflicting with tabs
-" nnoremap <Leader>t :RunTest<CR>
