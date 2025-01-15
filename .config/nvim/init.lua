@@ -3,7 +3,7 @@ vim.opt.runtimepath:append('~/.vim/after')
 vim.opt.packpath = vim.opt.runtimepath:get()
 vim.cmd('source ~/.vimrc')
 
-local on_attach = function(client)
+local function on_attach(client)
   local workspace = vim.lsp.buf.list_workspace_folders()[1]
   if workspace ~= nil then
     print(
@@ -14,7 +14,6 @@ local on_attach = function(client)
     print("LSP client attached:", client.name)
   end
 
-  client.server_capabilities.semanticTokensProvider = nil
   if client.name == 'ts_ls' then
     -- Disable LSP's syntax highlighting
     client.server_capabilities.semanticTokensProvider = nil
@@ -39,7 +38,7 @@ local cmp = require'cmp'
 cmp.setup({
   snippet = {
     expand = function(args)
-      vim.snippet.expand(args.body) -- For native neovim snippets (Neovim v0.10+)
+      vim.snippet.expand(args.body) -- Native Neovim snippets (req v0.10+)
     end,
   },
   window = {
@@ -114,10 +113,15 @@ require'lspconfig'.ts_ls.setup{
 }
 
 -- npm i -g vscode-langservers-extracted@4.8.0
+-- Broadcast snippet capability for completion
+local css_capabilities = vim.lsp.protocol.make_client_capabilities()
+css_capabilities.textDocument.completion.completionItem.snippetSupport = true
+require'lspconfig'.cssls.setup{
+  capabilities = css_capabilities,
+}
 require'lspconfig'.eslint.setup{
   -- See https://github.com/Microsoft/vscode-eslint#settings-options for all options.
   settings = {
-    -- debug = true,
     packageManager = 'pnpm',
     execArgv = '--max-old-space-size=8192',
   },
@@ -139,6 +143,7 @@ require'formatter'.setup({
   filetype = {
     javascript = { prettierd_format },
     typescript = { prettierd_format },
+    typescriptreact = { prettierd_format },
     ["*"] = {
       require('formatter.filetypes.any').remove_trailing_whitespace,
     },
