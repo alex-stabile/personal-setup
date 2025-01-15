@@ -1,8 +1,15 @@
 call plug#begin('~/.vim/plugged')
 
-Plug 'tmux-plugins/vim-tmux-focus-events'
-
 Plug 'phanviet/vim-monokai-pro'
+
+if has('nvim')
+  Plug 'neovim/nvim-lspconfig'
+  Plug 'mhartington/formatter.nvim'
+  Plug 'hrsh7th/cmp-nvim-lsp'
+  Plug 'hrsh7th/nvim-cmp'
+  Plug 'nvim-lua/plenary.nvim' " required for telescope
+  Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' }
+endif
 
 Plug 'pangloss/vim-javascript'
 Plug 'leafgarland/typescript-vim'
@@ -23,6 +30,8 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 call plug#end()
 
+let g:coc_start_at_startup = 0
+
 let g:coc_global_extensions = [
     \ 'coc-tsserver',
     \ 'coc-prettier',
@@ -31,36 +40,39 @@ let g:coc_global_extensions = [
 \ ]
 
 
-" if you have that FZF issue...
-" let $FZF_DEFAULT_COMMAND = ''
-" unlet $FZF_DEFAULT_COMMAND
-
+let use_coc = !has('nvim')
 ""
 " CoC stuff
 "
 " bug: need to call s:reset() in coc/prompt.vim:s:start_prompt()
 " see: https://github.com/neoclide/coc.nvim/issues/1775
-let g:coc_disable_transparent_cursor = 1
-" also did:
-" set guicursor+=a:ver1-Cursor/lCursor
-" set guicursor+=n-v-c:block-Cursor
-if v:version < 802
-  let g:coc_disable_startup_warning = 1
-  let g:coc_start_at_startup = 0
+"
+" Settings here: ~/.config/nvim/coc-settings.json
+if use_coc
+  let g:coc_disable_transparent_cursor = 1
+  " also did:
+  " set guicursor+=a:ver1-Cursor/lCursor
+  " set guicursor+=n-v-c:block-Cursor
+  if v:version < 802
+    let g:coc_disable_startup_warning = 1
+    let g:coc_start_at_startup = 0
+  endif
+  " show docs for thing under cursor
+  nnoremap <silent> K :call CocAction('doHover')<CR>
+  " gotos
+  nmap <silent> gd <Plug>(coc-definition)
+  nmap <silent> gy <Plug>(coc-type-definition)
+  nmap <silent> gr <Plug>(coc-references)
+  " jump from next,prev errors
+  nmap <silent> [g <Plug>(coc-diagnostic-prev)
+  nmap <silent> ]g <Plug>(coc-diagnostic-next)
+  " symbol renaming
+  nmap <leader>rn <Plug>(coc-rename)
+  " lists
+  nnoremap <silent> <space>e :<C-u>CocList diagnostics<cr>
+  " o.O
+  " nnoremap <silent> <space>s :<C-u>CocList -I symbols<cr>
 endif
-" show docs for thing under cursor
-nnoremap <silent> K :call CocAction('doHover')<CR>
-" gotos
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gr <Plug>(coc-references)
-" jump from next,prev errors
-nmap <silent> [g <Plug>(coc-diagnostic-prev)
-nmap <silent> ]g <Plug>(coc-diagnostic-next)
-" lists
-nnoremap <silent> <space>e :<C-u>CocList diagnostics<cr>
-" o.O
-" nnoremap <silent> <space>s :<C-u>CocList -I symbols<cr>
 
 ""
 " Colors
@@ -78,9 +90,6 @@ let &t_ZR="\e[23m"
 " soft, medium, hard; default: medium
 let g:gruvbox_contrast_dark = "hard"
 colorscheme gruvbox
-
-" required fzf setup
-set rtp+=/usr/local/opt/fzf
 
 ""
 " General settings
@@ -189,8 +198,8 @@ cnoremap <expr> %% expand('%:h').'/'
 " yank copies to clipboard
 vnoremap y y:call system('pbcopy', @")<CR>
 
-"" 
-" Leader Mappings 
+""
+" Leader Mappings
 " Resource: https://sheerun.net/2014/03/21/how-to-boost-your-vim-productivity/
 "
 
@@ -226,8 +235,8 @@ nnoremap <Leader>d :bdelete<CR>
 " FZF: buffers
 nnoremap <Leader>b :Buffers<CR>
 " FZF: files (no CR to narrow down)
-nnoremap <Leader>f :Files 
-nnoremap <Leader>r :Rg 
+nnoremap <Leader>f :Files
+nnoremap <Leader>r :Rg
 nnoremap <Leader>e :Explore<CR>
 " reload current file because sometimes there are weird syntax issues?
 nnoremap <Leader><Space> :edit %<CR>
@@ -247,32 +256,57 @@ nnoremap <leader>s :syntax sync fromstart<CR>
 nnoremap <leader>F
   \ :let @" = expand("%")<CR>
   \ y:call system('pbcopy', @")<CR>
+" logs!!
+nnoremap <Leader>m :messages<CR>
 
 ""
 " FZF Config
 "
-let previewopts = [
-      \ '--layout=reverse',
-      \ '--info=inline',
-      \ '--bind',
-      \ 'ctrl-d:preview-page-down,ctrl-e:preview-down,ctrl-u:preview-page-up,ctrl-y:preview-up',
-      \ '--preview',
-      \ 'cat {} || tree -d {} 2>/dev/null'
-      \ ]
+
+set rtp+=/usr/local/opt/fzf
+
+" defaults
+let g:fzf_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit' }
+
+let g:fzf_vim = {}
+let g:fzf_vim.preview_window = ['right,70%', 'ctrl-/']
+
+let window = { 'width': 0.9, 'height': 0.8 }
+let common_opts = [ '--layout=reverse', '--info=inline' ]
+let preview_file = 'bat --color=always --theme=gruvbox-dark --style=header,grid {}'
+let preview_line= 'bat --color=always --theme=gruvbox-dark --style=header,grid {1} --highlight-line {2}'
+
+" TODO: colors for previews
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'border':  ['fg', 'Ignore'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+
 command! -bang -nargs=? -complete=dir Files
-    \ call fzf#vim#files(<q-args>, {'options': previewopts}, <bang>0)
-" see: https://github.com/junegunn/fzf.vim/issues/732
-let rgpreviewopts = [
-      \ '--layout=reverse',
-      \ '--info=inline',
-      \ ]
+  \ call fzf#vim#files(
+    \ <q-args>,
+    \ fzf#wrap({'window': window, 'options': common_opts + ['--preview', preview_file]}),
+    \ <bang>0 )
+
 command! -bang -nargs=* Rg
-  \ call fzf#vim#grep('rg --column --no-heading --line-number --color=always '.shellescape(<q-args>),
-  \ 0,
-  \ fzf#vim#with_preview({'options': rgpreviewopts}),
-  \ <bang>0)
-" Alternate helper preview arguments:
-" \ '~/.vim/plugged/fzf.vim/bin/preview.sh {}'
+  \ call fzf#vim#grep(
+    \ 'rg --column --no-heading --line-number '.shellescape(<q-args>),
+    \ 0,
+    \ {'window': window, 'options': common_opts + ['--preview', preview_line]},
+    \ <bang>0 )
 
 ""
 " Experimental test stuff

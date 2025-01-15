@@ -142,15 +142,16 @@ $@
 }
 
 # ------------------------------------------------------------
-# FZF HAX
-# lit fuzzy searching
+# FZF setup
 # ------------------------------------------------------------
 
-# Set FZF defaults
-# Inspired by: https://github.com/sharkdp/bat/issues/357
-local DEFAULT_PREVIEW="(bat --color=always --style=header,grid --line-range :300 {} || tree -aC -L 1 {} || cat {}) 2>/dev/null"
-local DEFAULT_BINDING="ctrl-d:preview-page-down,ctrl-e:preview-down,ctrl-u:preview-page-up,ctrl-y:preview-up"
-export FZF_DEFAULT_OPTS="--ansi --preview-window 'right:60%' --preview '$DEFAULT_PREVIEW' --bind=$DEFAULT_BINDING"
+local preview_bind="ctrl-d:preview-page-down,ctrl-e:preview-down,ctrl-u:preview-page-up,ctrl-y:preview-up"
+export FZF_DEFAULT_OPTS="--ansi --bind=$preview_bind"
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Example to preview file or folder:
+# --preview="(bat --color=always --style=header,grid --line-range :300 {} || tree -aC -L 1 {}) 2>/dev/null"
 
 # fd - cd to selected directory
 # Inspired by: https://github.com/junegunn/fzf/wiki/examples
@@ -160,7 +161,7 @@ fd() {
   dir=$(find ${1:-.} -path '*/\.*' -prune \
                   -o -path '*/sorbet*' -prune \
                   -o -path '*/node_modules*' -prune \
-                  -o -type d -print 2> /dev/null | fzf +m) \
+                  -o -type d -print 2> /dev/null | fzf +m --preview 'tree -aC -L 1 {}') \
     && cd "$dir"
 }
 
@@ -193,7 +194,7 @@ fco() {
 # fuzzy search a job to foreground
 fj() {
   local joblines jobnum
-  joblines=$(jobs | fzf +m --layout=reverse --info=inline-right --border --height=10% --preview="") &&
+  joblines=$(jobs | fzf +m --layout=reverse --info=inline-right --border --height=10%) &&
     jobnum=$(echo "$joblines" | sed -nr "s/\[([0-9]+).*$/\1/p") &&
     fg "%$jobnum"
 }
@@ -203,8 +204,6 @@ flog() {
   git log --color=always --pretty=format:'%h %Cgreen%al%Cred%d %Creset%s' | fzf --preview 'git show --color=always {+1}'
 }
 
-# Add FZF
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Add retool-sh
 [ -d /home/alex/dev/retool-sh ] && export RETOOL_SH_DIR='/home/alex/dev/retool-sh'
@@ -269,3 +268,6 @@ export RETOOL_SH_DIR='/Users/astabile/Developer/retool-sh'
 export BOLD=false
 export UNDERLINE=false
 . "$RETOOL_SH_DIR/retoolrc"
+alias pnpm-switch="ls pnpm-lock.yaml &>/dev/null && corepack prepare --activate pnpm@\$(jq -r .devDependencies.pnpm < package.json) || echo Move to root of retool_development"
+export JAVA_HOME="$(/usr/libexec/java_home)"
+export PATH="${JAVA_HOME}/bin:$PATH"
