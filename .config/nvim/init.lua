@@ -146,6 +146,7 @@ require'lspconfig'.cssmodules_ls.setup{
     client.server_capabilities.definitionProvider = false
     on_attach(client)
   end,
+  filetypes = { 'typescriptreact' },
 }
 
 -- Set up formatting
