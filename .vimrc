@@ -116,8 +116,8 @@ set backspace=indent,eol,start
 set number
 set ruler
 " Always display last command and use a second line
-set laststatus=2
-set cmdheight=2
+" set laststatus=2
+" set cmdheight=2
 set confirm
 " remove S from shortmess flags: this will display number of matches in
 " message area when searching (e.g. "[1/3]")
