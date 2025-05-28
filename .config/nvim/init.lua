@@ -62,6 +62,17 @@ require'lspconfig'.bashls.setup{
   filetypes = { 'bash', 'zsh' },
 }
 
+require'lspconfig'.gopls.setup{
+  cmd = { '/Users/astabile/go/bin/gopls' },
+  on_attach = on_attach,
+  -- see: https://github.com/golang/tools/blob/master/gopls/doc/settings.md
+  settings = {
+    gopls = {
+      semanticTokens = true,
+    },
+  },
+}
+
 -- brew install lua-language-server
 require'lspconfig'.lua_ls.setup{
   on_attach = on_attach,
