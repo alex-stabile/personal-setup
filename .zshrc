@@ -12,7 +12,7 @@ alias gd='git diff'
 alias gds='git diff --staged'
 alias ga='git add'
 alias gb='git branch --show-current'
-alias gcm='git commit -m'
+alias gcm='git commit --no-verify -m'
 alias gp='git log -n 10 --pretty=oneline'
 alias prettylog='git log -n 10 --pretty=oneline'
 
@@ -51,10 +51,15 @@ $@
 }
 
 # FZF config
+if command -v fzf > /dev/null; then
+  local preview_bind="ctrl-d:preview-page-down,ctrl-e:preview-down,ctrl-u:preview-page-up,ctrl-y:preview-up"
+  export FZF_DEFAULT_OPTS="--bind=$preview_bind"
+  export FZF_COMPLETION_OPTS='--preview="bat --style=numbers,grid --color=always --line-range :300 {} 2>/dev/null || tree -L 2 -C {}"'
+  export FZF_CTRL_T_OPTS='--tmux --preview="bat --style=numbers,grid --color=always --line-range :300 {} 2>/dev/null || tree -L 2 -C {}"'
+  # Set up fzf key bindings and fuzzy completion
+  source <(fzf --zsh)
+fi
 
-local preview_bind="ctrl-d:preview-page-down,ctrl-e:preview-down,ctrl-u:preview-page-up,ctrl-y:preview-up"
-export FZF_DEFAULT_OPTS="--ansi --bind=$preview_bind"
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 # Example command to preview file or folder:
 # --preview="(bat --color=always --style=header,grid --line-range :300 {} || tree -aC -L 1 {}) 2>/dev/null"
 
