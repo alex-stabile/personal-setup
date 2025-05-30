@@ -1,20 +1,14 @@
 call plug#begin('~/.vim/plugged')
 
-Plug 'phanviet/vim-monokai-pro'
-
 if has('nvim')
+  Plug 'mason-org/mason.nvim'
   Plug 'neovim/nvim-lspconfig'
   Plug 'mhartington/formatter.nvim'
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/nvim-cmp'
-  Plug 'nvim-lua/plenary.nvim' " required for telescope
-  Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.8' }
+else
+  Plug 'neoclide/coc.nvim', {'branch': 'release'}
 endif
-
-Plug 'pangloss/vim-javascript'
-Plug 'leafgarland/typescript-vim'
-Plug 'peitalin/vim-jsx-typescript'
-Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
@@ -22,10 +16,9 @@ Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
 
+Plug 'phanviet/vim-monokai-pro'
 Plug 'alex-stabile/tokyonight-vim', {'branch': 'tweaks'}
 Plug 'morhetz/gruvbox'
-
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 call plug#end()
 
@@ -35,14 +28,14 @@ call plug#end()
 ""
 " CoC config
 " Settings in: ~/.config/nvim/coc-settings.json
-let g:coc_start_at_startup = 0
-let g:coc_global_extensions = [
-    \ 'coc-tsserver',
-    \ 'coc-prettier',
-    \ 'coc-eslint',
-    \ 'coc-json'
-\ ]
 if !has('nvim')
+  let g:coc_start_at_startup = 0
+  let g:coc_global_extensions = [
+      \ 'coc-tsserver',
+      \ 'coc-prettier',
+      \ 'coc-eslint',
+      \ 'coc-json'
+  \ ]
   let g:coc_disable_transparent_cursor = 1
   " also did:
   " set guicursor+=a:ver1-Cursor/lCursor
@@ -82,7 +75,8 @@ let &t_ZR="\e[23m"
 
 " See: https://github.com/morhetz/gruvbox/wiki/Configuration#ggruvbox_contrast_dark
 let g:gruvbox_contrast_dark = "hard"
-colorscheme gruvbox
+" colorscheme gruvbox
+colorscheme slate
 
 ""
 " General settings
@@ -153,6 +147,7 @@ autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 filetype indent plugin on
 set autoindent
 set shiftwidth=2
+set tabstop=4
 set softtabstop=2
 set expandtab
 syntax on
@@ -223,6 +218,33 @@ nnoremap <Leader>m :messages<CR>
 nnoremap <Leader>b :Buffers<CR>
 nnoremap <Leader>f :Files<Space>
 nnoremap <Leader>r :Rg<Space>
+
+""
+" Copy link to the current file + line on GitHub, e.g.:
+" https://github.com/org/repo/blob/<sha>/file.go#L3
+"
+function! GetGitHubPermalink()
+  let l:file = expand('%')
+  let l:line = line('.')
+  let l:repo_root = systemlist('git rev-parse --show-toplevel')[0]
+  let l:rel_path = substitute(l:file, l:repo_root . '/', '', '')
+  let l:commit = systemlist('git rev-parse HEAD')[0]
+  let l:remote = systemlist('git config --get remote.origin.url')[0]
+
+  " Convert SSH to HTTPS if needed
+  if l:remote =~ '^git@'
+    let l:remote = substitute(l:remote, 'git@', '', '')
+    let l:remote = substitute(l:remote, ':', '/', '')
+    let l:remote = 'https://' . l:remote
+  endif
+  let l:remote = substitute(l:remote, '.git$', '', '')
+
+  let l:url = printf('%s/blob/%s/%s#L%d', l:remote, l:commit, l:rel_path, l:line)
+  let @+ = l:url " Copy to system clipboard
+  echo 'Copied permalink: ' . l:url
+endfunction
+
+command! -nargs=0 Permalink call GetGitHubPermalink()
 
 ""
 " FZF Config
