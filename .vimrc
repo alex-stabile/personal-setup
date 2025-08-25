@@ -17,7 +17,12 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
 
 Plug 'phanviet/vim-monokai-pro'
-Plug 'alex-stabile/tokyonight-vim', {'branch': 'tweaks'}
+Plug 'sainnhe/sonokai'
+Plug 'sainnhe/everforest'
+Plug 'rebelot/kanagawa.nvim'
+Plug 'folke/tokyonight.nvim'
+Plug 'catppuccin/nvim', {'as': 'catppuccin'}
+Plug 'alex-stabile/tokyonight-vim', {'branch': 'tweaks', 'as': 'tokyo-mod'}
 Plug 'morhetz/gruvbox'
 
 call plug#end()
@@ -76,7 +81,18 @@ let &t_ZR="\e[23m"
 " See: https://github.com/morhetz/gruvbox/wiki/Configuration#ggruvbox_contrast_dark
 let g:gruvbox_contrast_dark = "hard"
 " colorscheme gruvbox
-colorscheme slate
+" colorscheme slate
+
+let g:everforest_better_performance = 1
+let g:everforest_background = "hard"
+let g:everforest_sign_column_background = "grey"
+let g:everforest_disable_italic_comment = 0
+
+" Darker background for sonokai (espresso), from mono-mod
+" TODO: augroup for colorscheme
+" highlight Normal guifg=#f8f8f2 guibg=#272822
+" highlight NormalNC guifg=#f8f8f2 guibg=#272822
+
 
 ""
 " General settings
@@ -244,7 +260,36 @@ function! GetGitHubPermalink()
   echo 'Copied permalink: ' . l:url
 endfunction
 
+" TODO: migrate to nvim_create_user_command to add desc
+" vim.api.nvim_create_user_command("Permalink", function()
+  "vim.fn["GetGitHubPermalink"]()
+"end, {
+  "desc = 'Copy GitHub permalink of current line',
+  "nargs = 0,
+"})
+"
 command! -nargs=0 Permalink call GetGitHubPermalink()
+
+function! CopyCommitURL() abort
+  " Get word under cursor
+  let l:sha = expand('<cword>')
+
+  let l:remote = systemlist('git config --get remote.origin.url')[0]
+  " Convert SSH to HTTPS if needed
+  if l:remote =~ '^git@'
+    let l:remote = substitute(l:remote, 'git@', '', '')
+    let l:remote = substitute(l:remote, ':', '/', '')
+    let l:remote = 'https://' . l:remote
+  endif
+  let l:remote = substitute(l:remote, '.git$', '', '')
+
+  let l:url = printf('%s/commits/%s', l:remote, l:sha)
+  let @+ = l:url " Copy to system clipboard
+  echo 'Copied URL: ' . l:url
+endfunction
+
+command! -nargs=0 CopyCommitURL call CopyCommitURL()
+
 
 ""
 " FZF Config
