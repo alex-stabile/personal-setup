@@ -283,7 +283,7 @@ function! CopyCommitURL() abort
   endif
   let l:remote = substitute(l:remote, '.git$', '', '')
 
-  let l:url = printf('%s/commits/%s', l:remote, l:sha)
+  let l:url = printf('%s/commit/%s', l:remote, l:sha)
   let @+ = l:url " Copy to system clipboard
   echo 'Copied URL: ' . l:url
 endfunction
