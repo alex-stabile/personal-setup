@@ -16,6 +16,8 @@ Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
 
+Plug 'nvim-treesitter/nvim-treesitter', {'branch': 'master', 'build': ':TSUpdate'}
+
 Plug 'phanviet/vim-monokai-pro'
 Plug 'sainnhe/sonokai'
 Plug 'sainnhe/everforest'
@@ -81,18 +83,17 @@ let &t_ZR="\e[23m"
 " See: https://github.com/morhetz/gruvbox/wiki/Configuration#ggruvbox_contrast_dark
 let g:gruvbox_contrast_dark = "hard"
 " colorscheme gruvbox
-" colorscheme slate
+colorscheme slate
 
 let g:everforest_better_performance = 1
 let g:everforest_background = "hard"
 let g:everforest_sign_column_background = "grey"
-let g:everforest_disable_italic_comment = 0
+let g:everforest_disable_italic_comment = 1 " I don't like italics
 
 " Darker background for sonokai (espresso), from mono-mod
 " TODO: augroup for colorscheme
 " highlight Normal guifg=#f8f8f2 guibg=#272822
 " highlight NormalNC guifg=#f8f8f2 guibg=#272822
-
 
 ""
 " General settings
@@ -146,6 +147,11 @@ augroup RelativeNum
     autocmd WinEnter,FocusGained,BufRead * if index(blacklist, &ft) < 0 | set number relativenumber | endif
     autocmd WinLeave,FocusLost * if index(blacklist, &ft) < 0 | set number norelativenumber | endif
 augroup END
+" Useful default fold behavior
+augroup Folds
+  autocmd BufNewFile,BufRead * setlocal foldlevelstart=99
+  autocmd BufNewFile,BufRead * setlocal foldmethod=indent
+augroup END
 
 ""
 " Filetype/syntax config
@@ -154,7 +160,7 @@ filetype plugin on
 autocmd BufNewFile,BufRead *.json set ft=jsonc
 " use shell highlighting for files with no extension
 autocmd BufNewFile,BufRead * if &ft == '' | set ft=sh | endif
-autocmd BufNewFile,BufRead * if &syntax == '' | set syntax=sh | endif
+" autocmd BufNewFile,BufRead * if &syntax == '' | set syntax=sh | endif
 " Fastlane is ruby so....
 autocmd BufNewFile,BufRead * if expand('%') =~ 'Fastfile' | set syntax=ruby | endif
 " Tabs
@@ -166,7 +172,7 @@ set shiftwidth=2
 set tabstop=4
 set softtabstop=2
 set expandtab
-syntax on
+" syntax on
 
 ""
 " Mappings
