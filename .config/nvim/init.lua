@@ -3,6 +3,19 @@ vim.opt.runtimepath:append('~/.vim/after')
 vim.opt.packpath = vim.opt.runtimepath:get()
 vim.cmd('source ~/.vimrc')
 
+require'mason'.setup()
+
+require'kanagawa'.setup{
+  undercurl = false,
+  commentStyle = { italic = false },
+  keywordStyle = { italic = false },
+}
+require'everforest'.setup{
+  background = "hard",
+  italics = false,
+  ui_contrast = "high",
+}
+
 local function on_attach(client)
   local workspace = vim.lsp.buf.list_workspace_folders()[1]
   if workspace ~= nil then
@@ -17,15 +30,32 @@ local function on_attach(client)
   vim.diagnostic.config{ update_in_insert = false }
   vim.opt.signcolumn = 'yes' -- Always show gutter to avoid thrash
 
+  -- vim.keymap.set("n", "<leader>F", vim.lsp.buf.format, { desc = "Format buffer" })
+  vim.keymap.set('n', '<leader>Rn', vim.lsp.buf.rename, { desc = 'Rename symbol under cursor' })
   vim.keymap.set('n','gd','<cmd>lua vim.lsp.buf.definition()<CR>')
   vim.keymap.set('n','gi','<cmd>lua vim.lsp.buf.implementation()<CR>')
   vim.keymap.set('n','K','<cmd>lua vim.lsp.buf.hover()<CR>')
-  vim.keymap.set('n','gr','<cmd>References<CR>')
+  vim.keymap.set('n','gre','<cmd>References<CR>')
   vim.keymap.set('n','gR','<cmd>lua vim.lsp.buf.references()<CR>')
   vim.keymap.set('n','[g','<cmd>lua vim.diagnostic.goto_prev()<CR>')
   vim.keymap.set('n',']g','<cmd>lua vim.diagnostic.goto_next()<CR>')
   vim.keymap.set('n','gk','<cmd>lua vim.diagnostic.open_float()<CR>')
 end
+
+require'nvim-treesitter.configs'.setup {
+  -- A list of parser names, or "all" (the listed parsers MUST always be installed)
+  ensure_installed = { "c", "cpp", "typescript", "lua", "vim", "vimdoc", "query" },
+  -- Install parsers synchronously (only applied to `ensure_installed`)
+  sync_install = false,
+  highlight = {
+    enable = true,
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
+}
 
 -- Set up nvim-cmp
 local cmp = require'cmp'
@@ -56,6 +86,12 @@ cmp.setup({
 -- Set up language servers
 -- vim.lsp.set_log_level('debug') -- Include logs from attached language servers
 
+-- float window style
+vim.o.winborder = 'bold'
+
+vim.lsp.enable('clangd')
+vim.lsp.config('clangd', { on_attach = on_attach })
+
 -- npm i -g bash-language-server
 require'lspconfig'.bashls.setup{
   on_attach = on_attach,
@@ -63,11 +99,11 @@ require'lspconfig'.bashls.setup{
 }
 
 require'lspconfig'.gopls.setup{
-  cmd = { '/Users/astabile/go/bin/gopls' },
   on_attach = on_attach,
   -- see: https://github.com/golang/tools/blob/master/gopls/doc/settings.md
   settings = {
     gopls = {
+      buildFlags = { "-mod=readonly" },
       semanticTokens = true,
     },
   },
@@ -132,32 +168,6 @@ require'lspconfig'.ts_ls.setup{
       enablePromptUseWorkspaceTsdk = true,
     },
   }
-}
-
--- npm i -g vscode-langservers-extracted@4.8.0
--- Broadcast snippet capability for completion
-local css_capabilities = vim.lsp.protocol.make_client_capabilities()
-css_capabilities.textDocument.completion.completionItem.snippetSupport = true
-require'lspconfig'.cssls.setup{
-  capabilities = css_capabilities,
-}
-require'lspconfig'.eslint.setup{
-  -- See https://github.com/Microsoft/vscode-eslint#settings-options for all options.
-  settings = {
-    packageManager = 'pnpm',
-    execArgv = '--max-old-space-size=8192',
-  },
-}
-
--- npm i -g cssmodules-language-server
--- Go to definition, hover for cssmodules referenced in JS
-require'lspconfig'.cssmodules_ls.setup{
-  on_attach = function (client)
-    -- no `definitionProvider` responses from this LSP to avoid conflicting with TS
-    client.server_capabilities.definitionProvider = false
-    on_attach(client)
-  end,
-  filetypes = { 'typescriptreact' },
 }
 
 -- Set up formatting

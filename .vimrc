@@ -85,11 +85,6 @@ let g:gruvbox_contrast_dark = "hard"
 " colorscheme gruvbox
 colorscheme slate
 
-let g:everforest_better_performance = 1
-let g:everforest_background = "hard"
-let g:everforest_sign_column_background = "grey"
-let g:everforest_disable_italic_comment = 1 " I don't like italics
-
 " Darker background for sonokai (espresso), from mono-mod
 " TODO: augroup for colorscheme
 " highlight Normal guifg=#f8f8f2 guibg=#272822
