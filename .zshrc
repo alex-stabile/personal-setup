@@ -117,6 +117,15 @@ flog() {
 
 # ZSH config
 
+autoload -Uz compinit
+compinit
+_comp_options+=(globdots) # include dotfiles
+compdef -d git # disable git because it's laggy
+
+# Prefix search with up arrow
+bindkey "^[[A" history-beginning-search-backward
+
+# Configure tab completion (see man zshoptions)
 zmodload zsh/complist
 # navigate completion menu with vim bindings
 bindkey -M menuselect 'h' vi-backward-char
@@ -124,35 +133,9 @@ bindkey -M menuselect 'k' vi-up-line-or-history
 bindkey -M menuselect 'j' vi-down-line-or-history
 bindkey -M menuselect 'l' vi-forward-char
 
-autoload -Uz compinit
-compinit
-_comp_options+=(globdots) # include dotfiles
-# man zshoptions "Completion"
 unsetopt BEEP
 unsetopt LIST_BEEP
 setopt LIST_PACKED
-setopt LIST_TYPES
 setopt AUTO_MENU
-setopt MENU_COMPLETE
 zstyle ':completion:*:*:*:*:descriptions' format '%F{green}-- %d --%f'
 zstyle ':completion:*' menu select
-# disable git autocompletion because it lags when completing files
-compdef -d git
-bindkey "^[[A" history-beginning-search-backward # prefix history search thing
-if command -v kubectl &> /dev/null
-then
-  source <(kubectl completion zsh)
-fi
-# source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# Your employer
-
-if [ -f ~/.retoolrc ]; then
-  source ~/.retoolrc
-fi
-
-# export PATH="/opt/homebrew/opt/kubernetes-cli/bin:$PATH"
-# autoload -U +X bashcompinit && bashcompinit
-# complete -o nospace -C /opt/homebrew/bin/terraform terraform
