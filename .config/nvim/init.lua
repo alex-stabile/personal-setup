@@ -22,6 +22,8 @@ install_plugins()
 
 -- everthing else - wip
 vim.cmd('source ~/.vimrc')
+-- float window style
+vim.o.winborder = 'bold'
 
 require'kanagawa'.setup{
   undercurl = false,
@@ -62,38 +64,22 @@ local function on_attach(client)
   vim.keymap.set('n','gk','<cmd>lua vim.diagnostic.open_float()<CR>')
 end
 
-require'nvim-treesitter.configs'.setup {
-  -- A list of parser names, or "all" (the listed parsers MUST always be installed)
-  ensure_installed = { "c", "cpp", "typescript", "tsx", "lua", "vim", "vimdoc", "query" },
-  -- Install parsers synchronously (only applied to `ensure_installed`)
-  sync_install = false,
-  highlight = {
-    enable = true,
-    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-    -- Using this option may slow down your editor, and you may see some duplicate highlights.
-    -- Instead of true it can also be a list of languages
-    additional_vim_regex_highlighting = false,
-  },
-}
-
 -- Set up language servers
 -- vim.lsp.set_log_level('debug') -- Include logs from attached language servers
 
--- float window style
-vim.o.winborder = 'bold'
+vim.lsp.config('*', { on_attach = on_attach })
 
+-- This could be improved, see:
+-- ~/.local/share/nvim/plugged/nvim-lspconfig/lsp/clangd.lua
 vim.lsp.config('clangd', { on_attach = on_attach })
--- vim.lsp.enable('clangd')
+vim.lsp.enable('clangd')
 
 -- npm i -g bash-language-server
 vim.lsp.config('bashls', {
-  on_attach = on_attach,
   filetypes = { 'bash', 'zsh' },
 })
 
 vim.lsp.config('gopls', {
-  on_attach = on_attach,
   -- see: https://github.com/golang/tools/blob/master/gopls/doc/settings.md
   settings = {
     gopls = {
@@ -105,7 +91,6 @@ vim.lsp.config('gopls', {
 
 -- brew install lua-language-server
 vim.lsp.config('lua_ls', {
-  on_attach = on_attach,
   -- Make the server aware of plugins and other runtime files
   -- See: https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#lua_ls
   on_init = function(client)
@@ -135,11 +120,10 @@ vim.lsp.config('lua_ls', {
 vim.lsp.enable('lua_ls')
 
 -- npm i -g vim-language-server
-vim.lsp.config('vimls', {
-  on_attach = on_attach
-})
+vim.lsp.config('vimls', {})
 
 vim.lsp.config('ts_ls', {
+  -- override attach function provided by lspconfig
   on_attach = on_attach,
   on_init = function(client)
     -- Disable LSP's syntax highlighting
@@ -164,6 +148,21 @@ vim.lsp.config('ts_ls', {
   }
 })
 vim.lsp.enable('ts_ls')
+
+require'nvim-treesitter.configs'.setup {
+  -- A list of parser names, or "all" (the listed parsers MUST always be installed)
+  ensure_installed = { "c", "cpp", "typescript", "tsx", "lua", "vim", "vimdoc", "query" },
+  -- Install parsers synchronously (only applied to `ensure_installed`)
+  sync_install = false,
+  highlight = {
+    enable = true,
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
+}
 
 -- Set up formatting
 local function prettierd_format()
