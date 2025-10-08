@@ -1,94 +1,31 @@
-call plug#begin('~/.vim/plugged')
-
-if has('nvim')
-  Plug 'mason-org/mason.nvim'
-  Plug 'neovim/nvim-lspconfig'
-  Plug 'mhartington/formatter.nvim'
-  Plug 'hrsh7th/cmp-nvim-lsp'
-  Plug 'hrsh7th/nvim-cmp'
-else
-  Plug 'neoclide/coc.nvim', {'branch': 'release'}
-endif
-
-Plug 'junegunn/fzf'
-Plug 'junegunn/fzf.vim'
-
-Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-rhubarb'
-
-Plug 'nvim-treesitter/nvim-treesitter', {'branch': 'master', 'build': ':TSUpdate'}
-
-Plug 'phanviet/vim-monokai-pro'
-Plug 'sainnhe/sonokai'
-Plug 'sainnhe/everforest'
-Plug 'rebelot/kanagawa.nvim'
-Plug 'folke/tokyonight.nvim'
-Plug 'catppuccin/nvim', {'as': 'catppuccin'}
-Plug 'alex-stabile/tokyonight-vim', {'branch': 'tweaks', 'as': 'tokyo-mod'}
-Plug 'morhetz/gruvbox'
-
-call plug#end()
-
-" dual caps lock map keyboard mod:
-" https://gist.github.com/tanyuan/55bca522bf50363ae4573d4bdcf06e2e?permalink_comment_id=4271644#macos
-
-""
-" CoC config
-" Settings in: ~/.config/nvim/coc-settings.json
 if !has('nvim')
-  let g:coc_start_at_startup = 0
-  let g:coc_global_extensions = [
-      \ 'coc-tsserver',
-      \ 'coc-prettier',
-      \ 'coc-eslint',
-      \ 'coc-json'
-  \ ]
-  let g:coc_disable_transparent_cursor = 1
-  " also did:
-  " set guicursor+=a:ver1-Cursor/lCursor
-  " set guicursor+=n-v-c:block-Cursor
-  if v:version < 802
-    let g:coc_disable_startup_warning = 1
-    let g:coc_start_at_startup = 0
-  endif
-  " show docs for thing under cursor
-  nnoremap <silent> K :call CocAction('doHover')<CR>
-  " gotos
-  nmap <silent> gd <Plug>(coc-definition)
-  nmap <silent> gy <Plug>(coc-type-definition)
-  nmap <silent> gr <Plug>(coc-references)
-  " jump from next,prev errors
-  nmap <silent> [g <Plug>(coc-diagnostic-prev)
-  nmap <silent> ]g <Plug>(coc-diagnostic-next)
-  " symbol renaming
-  nmap <leader>rn <Plug>(coc-rename)
-  " lists
-  nnoremap <silent> <space>e :<C-u>CocList diagnostics<cr>
-  " o.O
-  " nnoremap <silent> <space>s :<C-u>CocList -I symbols<cr>
-endif
+  call plug#begin('~/.vim/plugged')
+
+  Plug 'junegunn/fzf'
+  Plug 'junegunn/fzf.vim'
+
+  Plug 'tpope/vim-fugitive'
+  Plug 'tpope/vim-rhubarb'
+
+  Plug 'sainnhe/everforest'
+  Plug 'alex-stabile/tokyonight-vim', {'branch': 'tweaks', 'as': 'tokyo-mod'}
+
+  call plug#end()
+end
 
 ""
 " Colors
 "
-" Make sure .tmux.conf includes:
-" set -g default-terminal "xterm-256color"
-
 set termguicolors
 set background=dark
 " Enable italics (required for Mac)
 let &t_ZH="\e[3m"
 let &t_ZR="\e[23m"
-
-" See: https://github.com/morhetz/gruvbox/wiki/Configuration#ggruvbox_contrast_dark
-let g:gruvbox_contrast_dark = "hard"
-" colorscheme gruvbox
+let g:everforest_better_performance = 1
+let g:everforest_background = "hard"
+let g:everforest_sign_column_background = "grey"
+let g:everforest_disable_italic_comment = 1
 colorscheme slate
-
-" Darker background for sonokai (espresso), from mono-mod
-" TODO: augroup for colorscheme
-" highlight Normal guifg=#f8f8f2 guibg=#272822
-" highlight NormalNC guifg=#f8f8f2 guibg=#272822
 
 ""
 " General settings

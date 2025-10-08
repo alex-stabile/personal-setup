@@ -1,9 +1,27 @@
-vim.opt.runtimepath:prepend('~/.vim')
-vim.opt.runtimepath:append('~/.vim/after')
-vim.opt.packpath = vim.opt.runtimepath:get()
-vim.cmd('source ~/.vimrc')
+local function install_plugins()
+  local vim = vim
+  local Plug = vim.fn['plug#']
+  vim.call('plug#begin')
+  Plug('mason-org/mason.nvim')
+  Plug('neovim/nvim-lspconfig')
+  Plug('mhartington/formatter.nvim')
+  Plug('nvim-treesitter/nvim-treesitter', { ['branch'] = 'master', ['build'] = ':TSUpdate'})
 
-require'mason'.setup()
+  Plug('junegunn/fzf')
+  Plug('junegunn/fzf.vim')
+
+  Plug('tpope/vim-fugitive')
+  Plug('tpope/vim-rhubarb')
+
+  Plug('neanias/everforest-nvim', { ['branch'] = 'main' })
+  Plug('rebelot/kanagawa.nvim')
+  Plug('catppuccin/nvim', {['as'] = 'catppuccin'})
+  vim.call('plug#end')
+end
+install_plugins()
+
+-- everthing else - wip
+vim.cmd('source ~/.vimrc')
 
 require'kanagawa'.setup{
   undercurl = false,
@@ -15,6 +33,8 @@ require'everforest'.setup{
   italics = false,
   ui_contrast = "high",
 }
+
+require'mason'.setup()
 
 local function on_attach(client)
   local workspace = vim.lsp.buf.list_workspace_folders()[1]
@@ -44,7 +64,7 @@ end
 
 require'nvim-treesitter.configs'.setup {
   -- A list of parser names, or "all" (the listed parsers MUST always be installed)
-  ensure_installed = { "c", "cpp", "typescript", "lua", "vim", "vimdoc", "query" },
+  ensure_installed = { "c", "cpp", "typescript", "tsx", "lua", "vim", "vimdoc", "query" },
   -- Install parsers synchronously (only applied to `ensure_installed`)
   sync_install = false,
   highlight = {
@@ -57,48 +77,22 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 
--- Set up nvim-cmp
-local cmp = require'cmp'
-cmp.setup({
-  snippet = {
-    expand = function(args)
-      vim.snippet.expand(args.body) -- Native Neovim snippets (req v0.10+)
-    end,
-  },
-  window = {
-    -- completion = cmp.config.window.bordered(),
-    -- documentation = cmp.config.window.bordered(),
-  },
-  mapping = cmp.mapping.preset.insert({
-    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete(),
-    ['<C-e>'] = cmp.mapping.abort(),
-    ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-  }),
-  sources = cmp.config.sources({
-    { name = 'nvim_lsp' },
-  }, {
-    { name = 'buffer' },
-  })
-})
-
 -- Set up language servers
 -- vim.lsp.set_log_level('debug') -- Include logs from attached language servers
 
 -- float window style
 vim.o.winborder = 'bold'
 
-vim.lsp.enable('clangd')
 vim.lsp.config('clangd', { on_attach = on_attach })
+-- vim.lsp.enable('clangd')
 
 -- npm i -g bash-language-server
-require'lspconfig'.bashls.setup{
+vim.lsp.config('bashls', {
   on_attach = on_attach,
   filetypes = { 'bash', 'zsh' },
-}
+})
 
-require'lspconfig'.gopls.setup{
+vim.lsp.config('gopls', {
   on_attach = on_attach,
   -- see: https://github.com/golang/tools/blob/master/gopls/doc/settings.md
   settings = {
@@ -107,10 +101,10 @@ require'lspconfig'.gopls.setup{
       semanticTokens = true,
     },
   },
-}
+})
 
 -- brew install lua-language-server
-require'lspconfig'.lua_ls.setup{
+vim.lsp.config('lua_ls', {
   on_attach = on_attach,
   -- Make the server aware of plugins and other runtime files
   -- See: https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#lua_ls
@@ -136,15 +130,16 @@ require'lspconfig'.lua_ls.setup{
   settings = {
     Lua = {}
   }
-}
+})
+-- TODO: factor out enables?
+vim.lsp.enable('lua_ls')
 
 -- npm i -g vim-language-server
-require'lspconfig'.vimls.setup{
+vim.lsp.config('vimls', {
   on_attach = on_attach
-}
+})
 
-local capabilities = require'cmp_nvim_lsp'.default_capabilities()
-require'lspconfig'.ts_ls.setup{
+vim.lsp.config('ts_ls', {
   on_attach = on_attach,
   on_init = function(client)
     -- Disable LSP's syntax highlighting
@@ -155,7 +150,6 @@ require'lspconfig'.ts_ls.setup{
     -- (use definition instead)
     client.server_capabilities.implementationProvider = false
   end,
-  capabilities = capabilities,
   settings = {
     -- 80001: "File is a CommonJS module..."
     diagnostics = { ignoredCodes = { 80001 } },
@@ -168,7 +162,8 @@ require'lspconfig'.ts_ls.setup{
       enablePromptUseWorkspaceTsdk = true,
     },
   }
-}
+})
+vim.lsp.enable('ts_ls')
 
 -- Set up formatting
 local function prettierd_format()
