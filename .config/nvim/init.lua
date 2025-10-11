@@ -20,10 +20,12 @@ local function install_plugins()
 end
 install_plugins()
 
--- everthing else - wip
-vim.cmd('source ~/.vimrc')
+vim.o.termguicolors = true
+vim.o.background = 'dark'
 -- float window style
 vim.o.winborder = 'bold'
+-- everthing else
+vim.cmd('source ../../.vim/setup.vim')
 
 require'kanagawa'.setup{
   undercurl = false,
@@ -35,6 +37,8 @@ require'everforest'.setup{
   italics = false,
   ui_contrast = "high",
 }
+
+vim.cmd('colorscheme kanagawa')
 
 require'mason'.setup()
 
