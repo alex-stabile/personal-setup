@@ -42,7 +42,8 @@ vim.cmd('colorscheme kanagawa')
 
 require'mason'.setup()
 
-local function on_attach(client)
+local function on_attach(args)
+  local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
   local workspace = vim.lsp.buf.list_workspace_folders()[1]
   if workspace ~= nil then
     print(
@@ -67,91 +68,21 @@ local function on_attach(client)
   vim.keymap.set('n',']g','<cmd>lua vim.diagnostic.goto_next()<CR>')
   vim.keymap.set('n','gk','<cmd>lua vim.diagnostic.open_float()<CR>')
 end
+vim.api.nvim_create_autocmd('LspAttach', { callback = on_attach })
 
--- Set up language servers
--- vim.lsp.set_log_level('debug') -- Include logs from attached language servers
-
-vim.lsp.config('*', { on_attach = on_attach })
-
--- This could be improved, see:
--- ~/.local/share/nvim/plugged/nvim-lspconfig/lsp/clangd.lua
-vim.lsp.config('clangd', { on_attach = on_attach })
+-- LSP setup
+-- nvim-lspconfig defaults in:
+-- ~/.local/share/nvim/plugged/nvim-lspconfig/lsp/<name>.lua
+-- my configs in ./lsp/<name>.lua
+vim.lsp.enable('bashls')
 vim.lsp.enable('clangd')
-
--- npm i -g bash-language-server
-vim.lsp.config('bashls', {
-  filetypes = { 'bash', 'zsh' },
-})
-
-vim.lsp.config('gopls', {
-  -- see: https://github.com/golang/tools/blob/master/gopls/doc/settings.md
-  settings = {
-    gopls = {
-      buildFlags = { "-mod=readonly" },
-      semanticTokens = true,
-    },
-  },
-})
-
--- brew install lua-language-server
-vim.lsp.config('lua_ls', {
-  -- Make the server aware of plugins and other runtime files
-  -- See: https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#lua_ls
-  on_init = function(client)
-    if client.workspace_folders then
-      local path = client.workspace_folders[1].name
-      if vim.loop.fs_stat(path..'/.luarc.json') or vim.loop.fs_stat(path..'/.luarc.jsonc') then
-        return
-      end
-    end
-    client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
-      runtime = {
-        version = 'LuaJIT' -- Neovim uses LuaJIT
-      },
-      workspace = {
-        checkThirdParty = false,
-        library = {
-          vim.env.VIMRUNTIME
-        }
-      }
-    })
-  end,
-  settings = {
-    Lua = {}
-  }
-})
--- TODO: factor out enables?
+vim.lsp.enable('gopls')
 vim.lsp.enable('lua_ls')
-
--- npm i -g vim-language-server
-vim.lsp.config('vimls', {})
-
-vim.lsp.config('ts_ls', {
-  -- override attach function provided by lspconfig
-  on_attach = on_attach,
-  on_init = function(client)
-    -- Disable LSP's syntax highlighting
-    client.server_capabilities.semanticTokensProvider = nil
-    -- Disable formatting to avoid conflict with prettier
-    client.server_capabilities.documentFormattingProvider = false
-    -- no `implementationProvider` responses from this LSP to avoid conflicting with css modules
-    -- (use definition instead)
-    client.server_capabilities.implementationProvider = false
-  end,
-  settings = {
-    -- 80001: "File is a CommonJS module..."
-    diagnostics = { ignoredCodes = { 80001 } },
-  },
-  -- See https://github.com/typescript-language-server/typescript-language-server/blob/master/docs/configuration.md
-  init_options = {
-    maxTsServerMemory = 10240,
-    typescript = {
-      tsdk = "node_modules/typescript/lib",
-      enablePromptUseWorkspaceTsdk = true,
-    },
-  }
-})
 vim.lsp.enable('ts_ls')
+vim.lsp.enable('vimls')
+
+-- Load custom :References command to integrate fzf + lsp
+require'fzf-lsp-references'
 
 require'nvim-treesitter.configs'.setup {
   -- A list of parser names, or "all" (the listed parsers MUST always be installed)
@@ -190,6 +121,3 @@ require'formatter'.setup({
     },
   }
 })
-
--- Load custom :References command to integrate fzf + lsp
-require'fzf-lsp-references'
