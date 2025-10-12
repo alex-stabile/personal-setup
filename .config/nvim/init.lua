@@ -77,6 +77,8 @@ vim.lsp.enable('bashls')
 vim.lsp.enable('clangd')
 vim.lsp.enable('gopls')
 vim.lsp.enable('lua_ls')
+vim.lsp.enable('ruby_lsp')
+vim.lsp.enable('sorbet')
 vim.lsp.enable('ts_ls')
 vim.lsp.enable('vimls')
 
