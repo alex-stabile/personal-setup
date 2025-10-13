@@ -1,5 +1,4 @@
 local function install_plugins()
-  local vim = vim
   local Plug = vim.fn['plug#']
   vim.call('plug#begin')
   Plug('mason-org/mason.nvim')
@@ -24,7 +23,7 @@ vim.o.termguicolors = true
 vim.o.background = 'dark'
 -- float window style
 vim.o.winborder = 'bold'
--- everthing else
+-- everything else
 vim.cmd('source ../../.vim/setup.vim')
 
 require'kanagawa'.setup{

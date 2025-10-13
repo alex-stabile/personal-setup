@@ -11,9 +11,6 @@ Plug 'alex-stabile/tokyonight-vim', {'branch': 'tweaks', 'as': 'tokyo-mod'}
 
 call plug#end()
 
-""
-" Colors
-"
 set termguicolors
 set background=dark
 " Enable italics (required for Mac)
