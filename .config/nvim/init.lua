@@ -3,8 +3,9 @@ local function install_plugins()
   vim.call('plug#begin')
   Plug('mason-org/mason.nvim')
   Plug('neovim/nvim-lspconfig')
-  Plug('mhartington/formatter.nvim')
-  Plug('nvim-treesitter/nvim-treesitter', { ['branch'] = 'master', ['build'] = ':TSUpdate'})
+  Plug('nvim-treesitter/nvim-treesitter', { ['branch'] = 'master', ['build'] = ':TSUpdate' })
+
+  Plug('stevearc/conform.nvim')
 
   Plug('junegunn/fzf')
   Plug('junegunn/fzf.vim')
@@ -14,7 +15,7 @@ local function install_plugins()
 
   Plug('neanias/everforest-nvim', { ['branch'] = 'main' })
   Plug('rebelot/kanagawa.nvim')
-  Plug('catppuccin/nvim', {['as'] = 'catppuccin'})
+  Plug('catppuccin/nvim', { ['as'] = 'catppuccin' })
   vim.call('plug#end')
 end
 install_plugins()
@@ -56,8 +57,10 @@ local function on_attach(args)
   vim.diagnostic.config{ update_in_insert = false }
   vim.opt.signcolumn = 'yes' -- Always show gutter to avoid thrash
 
-  -- vim.keymap.set("n", "<leader>F", vim.lsp.buf.format, { desc = "Format buffer" })
-  vim.keymap.set('n', '<leader>Rn', vim.lsp.buf.rename, { desc = 'Rename symbol under cursor' })
+  vim.keymap.set("n", "<leader>F", function()
+    require("conform").format({ lsp_fallback = false })
+  end, { desc = "Format buffer" })
+  vim.keymap.set('n','<leader>Rn', vim.lsp.buf.rename, { desc = 'Rename symbol under cursor' })
   vim.keymap.set('n','gd','<cmd>lua vim.lsp.buf.definition()<CR>')
   vim.keymap.set('n','gi','<cmd>lua vim.lsp.buf.implementation()<CR>')
   vim.keymap.set('n','K','<cmd>lua vim.lsp.buf.hover()<CR>')
@@ -76,18 +79,20 @@ vim.api.nvim_create_autocmd('LspAttach', { callback = on_attach })
 vim.lsp.enable('bashls')
 vim.lsp.enable('clangd')
 vim.lsp.enable('gopls')
+vim.lsp.enable('jsonls')
 vim.lsp.enable('lua_ls')
 vim.lsp.enable('ruby_lsp')
 vim.lsp.enable('sorbet')
 vim.lsp.enable('ts_ls')
 vim.lsp.enable('vimls')
+vim.lsp.enable('yamlls')
 
 -- Load custom :References command to integrate fzf + lsp
 require'fzf-lsp-references'
 
 require'nvim-treesitter.configs'.setup {
   -- A list of parser names, or "all" (the listed parsers MUST always be installed)
-  ensure_installed = { "c", "cpp", "typescript", "tsx", "lua", "vim", "vimdoc", "query" },
+  ensure_installed = { "c", "cpp", "typescript", "tsx", "lua", "vim", "vimdoc", "query", "yaml" },
   -- Install parsers synchronously (only applied to `ensure_installed`)
   sync_install = false,
   highlight = {
@@ -100,25 +105,18 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 
--- Set up formatting
-local function prettierd_format()
-  return {
-    exe = "prettierd",
-    args = {vim.api.nvim_buf_get_name(0)},
-    stdin = true
-  }
-end
--- npm i -g @fsouza/prettierd
--- Example: cat file.ts | prettierd file.ts
-require'formatter'.setup({
-  logging = true,
-  log_level = vim.log.levels.WARN,
-  filetype = {
-    javascript = { prettierd_format },
-    typescript = { prettierd_format },
-    typescriptreact = { prettierd_format },
-    ["*"] = {
-      require('formatter.filetypes.any').remove_trailing_whitespace,
-    },
-  }
-})
+require'conform'.setup {
+  formatters_by_ft = {
+    javascript = { "prettierd" },
+    typescript = { "prettierd" },
+    typescriptreact = { "prettierd" },
+    javascriptreact = { "prettierd" },
+    css = { "prettierd" },
+    ruby = { "prettierd" },
+  },
+  format_on_save = {
+    -- These options will be passed to conform.format()
+    timeout_ms = 500,
+    lsp_fallback = false,
+  },
+}
