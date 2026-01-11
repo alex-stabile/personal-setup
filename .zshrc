@@ -50,6 +50,22 @@ $@
   echo $msg
 }
 
+# Widgets
+# ZLE widgets can read the current command line buffer and do things to it
+# LBUFFER = text to the left of the cursor, RBUFFER = text to the right
+# Select a git branch using FZF
+branch_expand_widget() {
+  local previewcmd="git --no-pager log -50 --color=always --pretty=format:'%Cgreen%h%Cred %al%Creset %s' {1}"
+  local branches=$(git --no-pager branch | fzf --multi --preview="$previewcmd" | sed "s/.* //")
+  # @f: turn scalar (string) into array on newlines
+  # (j...): join array using space character
+  LBUFFER+=${(j: :)${(@f)branches}}
+
+}
+zle -N branch_expand_widget
+bindkey '^B' branch_expand_widget
+
+
 # FZF config
 if command -v fzf > /dev/null; then
   local preview_bind="ctrl-d:preview-page-down,ctrl-e:preview-down,ctrl-u:preview-page-up,ctrl-y:preview-up"
