@@ -159,6 +159,20 @@ endfunction
 
 command! -nargs=0 Permalink call GetGitHubPermalink()
 
+" Copy current file + line prefixed with '@', for pasting into Claude
+" e.g. 'foo/bar.ts:4'
+function! ClaudeRef()
+  let l:file = expand('%')
+  let l:line = line('.')
+  let l:repo_root = systemlist('git rev-parse --show-toplevel')[0]
+  let l:rel_path = substitute(l:file, l:repo_root . '/', '', '')
+  let l:location = printf('@%s:%d', l:rel_path, l:line)
+  let @+ = l:location " Copy to system clipboard
+  echo 'Copied location for Claude: ' . l:location
+endfunction
+
+command! -nargs=0 ClaudeRef call ClaudeRef()
+
 function! CopyCommitURL() abort
   " Get word under cursor
   let l:sha = expand('<cword>')
