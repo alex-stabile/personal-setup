@@ -6,6 +6,7 @@ local function install_plugins()
   Plug('nvim-treesitter/nvim-treesitter', { ['branch'] = 'master', ['build'] = ':TSUpdate' })
 
   Plug('stevearc/conform.nvim')
+  Plug('mfussenegger/nvim-lint')
 
   Plug('junegunn/fzf')
   Plug('junegunn/fzf.vim')
@@ -57,9 +58,6 @@ local function on_attach(args)
   vim.diagnostic.config{ update_in_insert = false }
   vim.opt.signcolumn = 'yes' -- Always show gutter to avoid thrash
 
-  vim.keymap.set("n", "<leader>F", function()
-    require("conform").format({ lsp_fallback = false })
-  end, { desc = "Format buffer" })
   vim.keymap.set('n','<leader>Rn', vim.lsp.buf.rename, { desc = 'Rename symbol under cursor' })
   vim.keymap.set('n','gd','<cmd>lua vim.lsp.buf.definition()<CR>')
   vim.keymap.set('n','gi','<cmd>lua vim.lsp.buf.implementation()<CR>')
@@ -105,6 +103,30 @@ require'nvim-treesitter.configs'.setup {
   },
 }
 
+vim.env.ESLINT_D_PPID = vim.fn.getpid()
+require('lint').linters_by_ft = {
+  javascript = { "eslint_d" },
+  typescript = { "eslint_d" },
+  typescriptreact = { "eslint_d" },
+  javascriptreact = { "eslint_d" },
+}
+vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
+  -- Note this autocmd is javascript-specific for the cwd handling
+  pattern = { '*.js', '*.ts', '*.jsx', '*.tsx' , '*.mjs', '*.cjs' },
+  callback = function()
+    -- arg0: the linter to use, nil to infer from filetype
+    -- arg1.cwd: nvim-lint does no magic to determine the cwd for the command, and will
+    --  use the vim session's cwd by default, so we need to pass our own in a monorepo.
+    --  This expr means: for the current buffer, find the first parent dir containing config file
+    require('lint').try_lint(nil, { cwd = vim.fs.root(0, { 'eslint.config.mjs', 'package.json' }) })
+  end,
+})
+vim.api.nvim_create_user_command('ESLint', function()
+  -- nvim-lint has a bug: it prints the cd operations when it changes to handle the passed cwd,
+  -- so this is a workaround to silence it
+  vim.cmd('silent! lua require("lint").try_lint("eslint_d", { cwd = vim.fs.root(0, { "eslint.config.mjs", "package.json" }) })')
+end, { desc = 'Run eslint_d' })
+
 require'conform'.setup {
   formatters_by_ft = {
     javascript = { "prettierd" },
@@ -120,3 +142,9 @@ require'conform'.setup {
     lsp_fallback = false,
   },
 }
+vim.api.nvim_create_user_command('Format', function()
+  require('conform').format({ lsp_fallback = false, timeout_ms = 1000 })
+end, { desc = 'Use eslint_d to run eslint --fix' })
+vim.api.nvim_create_user_command('ESLintFix', function()
+  require('conform').format({ formatters = { 'eslint_d' }, timeout_ms = 5000 })
+end, { desc = 'Use eslint_d to run eslint --fix' })
