@@ -136,13 +136,17 @@ nnoremap <Leader>r :Rg<Space>
 
 " Copy link to the current file + line on GitHub, e.g.:
 " https://github.com/org/repo/blob/<sha>/file.go#L3
-function! GetGitHubPermalink()
+function! GetGitHubPermalink(branch = "")
   let l:file = expand('%')
   let l:line = line('.')
   let l:repo_root = systemlist('git rev-parse --show-toplevel')[0]
   let l:rel_path = substitute(l:file, l:repo_root . '/', '', '')
-  let l:commit = systemlist('git rev-parse HEAD')[0]
   let l:remote = systemlist('git config --get remote.origin.url')[0]
+  if !empty(a:branch)
+    let l:ref = a:branch
+  else
+    let l:ref = systemlist('git rev-parse HEAD')[0]
+  endif
 
   " Convert SSH to HTTPS if needed
   if l:remote =~ '^git@'
@@ -152,12 +156,13 @@ function! GetGitHubPermalink()
   endif
   let l:remote = substitute(l:remote, '.git$', '', '')
 
-  let l:url = printf('%s/blob/%s/%s#L%d', l:remote, l:commit, l:rel_path, l:line)
+  let l:url = printf('%s/blob/%s/%s#L%d', l:remote, l:ref, l:rel_path, l:line)
   let @+ = l:url " Copy to system clipboard
   echo 'Copied permalink: ' . l:url
 endfunction
 
 command! -nargs=0 Permalink call GetGitHubPermalink()
+command! -nargs=0 Masterlink call GetGitHubPermalink('master')
 
 " Copy current file + line prefixed with '@', for pasting into Claude
 " e.g. 'foo/bar.ts:4'
