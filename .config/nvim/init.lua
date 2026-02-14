@@ -5,6 +5,9 @@ local function install_plugins()
   Plug('neovim/nvim-lspconfig')
   Plug('nvim-treesitter/nvim-treesitter', { ['branch'] = 'master', ['build'] = ':TSUpdate' })
 
+  -- use a release tag to download pre-built binaries.
+  Plug('saghen/blink.cmp', { ['tag'] = 'v1.*' })
+
   Plug('stevearc/conform.nvim')
   Plug('mfussenegger/nvim-lint')
 
@@ -105,6 +108,28 @@ require'nvim-treesitter.configs'.setup {
   },
   indent = { enable = true },
 }
+
+require('blink.cmp').setup {
+  keymap = { preset = 'super-tab' },
+  appearance = {
+    nerd_font_variant = 'mono'
+  },
+  completion = {
+    documentation = {
+      auto_show = true,
+    },
+  },
+  sources = {
+    default = { 'lsp', 'path', 'snippets', 'buffer' },
+  },
+  fuzzy = {
+    implementation = "prefer_rust_with_warning",
+    use_typo_resistance = false,
+  },
+}
+vim.lsp.config('ts_ls', {
+  capabilities = require('blink.cmp').get_lsp_capabilities(),
+})
 
 vim.env.ESLINT_D_PPID = vim.fn.getpid()
 require('lint').linters_by_ft = {

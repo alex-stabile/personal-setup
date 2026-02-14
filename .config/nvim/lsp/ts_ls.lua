@@ -11,6 +11,7 @@ return {
   settings = {
     -- 80001: "File is a CommonJS module..."
     -- diagnostics = { ignoredCodes = { 80001 } },
+    completions = { completeFunctionCalls = true },
   },
   -- See https://github.com/typescript-language-server/typescript-language-server/blob/master/docs/configuration.md
   init_options = {
