@@ -60,11 +60,9 @@ branch_expand_widget() {
   # @f: turn scalar (string) into array on newlines
   # (j...): join array using space character
   LBUFFER+=${(j: :)${(@f)branches}}
-
 }
 zle -N branch_expand_widget
 bindkey '^B' branch_expand_widget
-
 
 # FZF config
 if command -v fzf > /dev/null; then
@@ -137,6 +135,38 @@ autoload -Uz compinit
 compinit
 _comp_options+=(globdots) # include dotfiles
 compdef -d git # disable git because it's laggy
+
+# Save original gh completion function if it exists
+if (( ${+functions[_gh]} )); then
+  functions[_gh_original]=$functions[_gh]
+fi
+
+_gh_custom() {
+  local reviewer_file="$HOME/Developer/team-reviewers.txt"
+
+  # Check if we're completing the --reviewer flag (e.g. gh pr create --reviewer)
+  # and autocomplete with teammates from a file
+  local prev_word="${words[CURRENT-1]}"
+  local current_word="${words[CURRENT]}"
+  if [[ "$prev_word" == "--reviewer" ]] || [[ "$current_word" == *","* && "${words[*]}" == *"--reviewer"* ]]; then
+    if [[ -f "$reviewer_file" ]]; then
+      local -a reviewers
+      # Filter empty lines and ones starting with '#'
+      reviewers=("${(@f)$(grep -v '^\s*#' "$reviewer_file" | grep -v '^\s*$')}")
+      _values -s ',' 'Reviewer GitHub handles' $reviewers
+      return 0
+    fi
+  fi
+
+  # For everything else, call the original completion function
+  if (( ${+functions[_gh_original]} )); then
+    _gh_original "$@"
+  else
+    _files
+  fi
+}
+
+compdef _gh_custom gh
 
 # Prefix search with up arrow
 bindkey "^[[A" history-beginning-search-backward
