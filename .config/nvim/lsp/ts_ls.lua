@@ -16,10 +16,6 @@ return {
   -- See https://github.com/typescript-language-server/typescript-language-server/blob/master/docs/configuration.md
   init_options = {
     hostInfo = 'neovim',
-    maxTsServerMemory = 10240,
-    typescript = {
-      tsdk = 'node_modules/typescript/lib',
-      enablePromptUseWorkspaceTsdk = true,
-    },
+    maxTsServerMemory = 12288,
   },
 }
