@@ -18,7 +18,7 @@ return {
     hostInfo = 'neovim',
     maxTsServerMemory = 10240,
     typescript = {
-      tsdk = "node_modules/typescript/lib",
+      tsdk = 'node_modules/typescript/lib',
       enablePromptUseWorkspaceTsdk = true,
     },
   },
