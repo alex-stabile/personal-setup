@@ -33,45 +33,42 @@ vim.o.winborder = 'bold'
 -- everything else
 vim.cmd('source ' .. vim.fn.expand('<sfile>:p:h') .. '/../../.vim/setup.vim')
 
-require'kanagawa'.setup{
+require('kanagawa').setup {
   undercurl = false,
   commentStyle = { italic = false },
   keywordStyle = { italic = false },
 }
-require'everforest'.setup{
-  background = "hard",
+require('everforest').setup {
+  background = 'hard',
   italics = false,
-  ui_contrast = "high",
+  ui_contrast = 'high',
 }
 
 vim.cmd('colorscheme kanagawa')
 
-require'mason'.setup()
+require('mason').setup()
 
 local function on_attach(args)
   local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
   local workspace = vim.lsp.buf.list_workspace_folders()[1]
   if workspace ~= nil then
-    print(
-      "LSP client attached:",
-      client.name .. "@" .. workspace
-    )
+    print('LSP client attached:', client.name .. '@' .. workspace)
   else
-    print("LSP client attached:", client.name)
+    print('LSP client attached:', client.name)
   end
   -- Default, see: https://github.com/neovim/neovim/issues/26078
-  vim.diagnostic.config{ update_in_insert = false }
+  vim.diagnostic.config { update_in_insert = false }
   vim.opt.signcolumn = 'yes' -- Always show gutter to avoid thrash
 
-  vim.keymap.set('n','<leader>Rn', vim.lsp.buf.rename, { desc = 'Rename symbol under cursor' })
-  vim.keymap.set('n','gd','<cmd>lua vim.lsp.buf.definition()<CR>')
-  vim.keymap.set('n','gi','<cmd>lua vim.lsp.buf.implementation()<CR>')
-  vim.keymap.set('n','K','<cmd>lua vim.lsp.buf.hover()<CR>')
-  vim.keymap.set('n','gre','<cmd>References<CR>')
-  vim.keymap.set('n','gR','<cmd>lua vim.lsp.buf.references()<CR>')
-  vim.keymap.set('n','[g','<cmd>lua vim.diagnostic.goto_prev()<CR>')
-  vim.keymap.set('n',']g','<cmd>lua vim.diagnostic.goto_next()<CR>')
-  vim.keymap.set('n','gk','<cmd>lua vim.diagnostic.open_float()<CR>')
+  vim.keymap.set('n', '<leader>Rn', vim.lsp.buf.rename, { desc = 'Rename symbol under cursor' })
+  vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>')
+  vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>')
+  vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
+  vim.keymap.set('n', 'gre', '<cmd>References<CR>')
+  vim.keymap.set('n', 'gR', '<cmd>lua vim.lsp.buf.references()<CR>')
+  vim.keymap.set('n', '[g', '<cmd>lua vim.diagnostic.goto_prev()<CR>')
+  vim.keymap.set('n', ']g', '<cmd>lua vim.diagnostic.goto_next()<CR>')
+  vim.keymap.set('n', 'gk', '<cmd>lua vim.diagnostic.open_float()<CR>')
 end
 vim.api.nvim_create_autocmd('LspAttach', { callback = on_attach })
 
@@ -91,11 +88,11 @@ vim.lsp.enable('vimls')
 vim.lsp.enable('yamlls')
 
 -- Load custom :References command to integrate fzf + lsp
-require'fzf-lsp-references'
+require('fzf-lsp-references')
 
-require'nvim-treesitter.configs'.setup {
+require('nvim-treesitter.configs').setup {
   -- A list of parser names, or "all" (the listed parsers MUST always be installed)
-  ensure_installed = { "c", "cpp", "typescript", "tsx", "lua", "vim", "vimdoc", "query", "yaml" },
+  ensure_installed = { 'c', 'cpp', 'typescript', 'tsx', 'lua', 'vim', 'vimdoc', 'query', 'yaml' },
   -- Install parsers synchronously (only applied to `ensure_installed`)
   sync_install = false,
   highlight = {
@@ -116,7 +113,7 @@ require('blink.cmp').setup {
     ['<C-j>'] = { 'select_next', 'fallback' },
   },
   appearance = {
-    nerd_font_variant = 'mono'
+    nerd_font_variant = 'mono',
   },
   completion = {
     documentation = {
@@ -134,7 +131,7 @@ require('blink.cmp').setup {
     default = { 'lsp', 'path', 'snippets', 'buffer' },
   },
   fuzzy = {
-    implementation = "prefer_rust_with_warning",
+    implementation = 'prefer_rust_with_warning',
     use_typo_resistance = false,
   },
 }
@@ -144,14 +141,14 @@ vim.lsp.config('ts_ls', {
 
 vim.env.ESLINT_D_PPID = vim.fn.getpid()
 require('lint').linters_by_ft = {
-  javascript = { "eslint_d" },
-  typescript = { "eslint_d" },
-  typescriptreact = { "eslint_d" },
-  javascriptreact = { "eslint_d" },
+  javascript = { 'eslint_d' },
+  typescript = { 'eslint_d' },
+  typescriptreact = { 'eslint_d' },
+  javascriptreact = { 'eslint_d' },
 }
 vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
   -- Note this autocmd is javascript-specific for the cwd handling
-  pattern = { '*.js', '*.ts', '*.jsx', '*.tsx' , '*.mjs', '*.cjs' },
+  pattern = { '*.js', '*.ts', '*.jsx', '*.tsx', '*.mjs', '*.cjs' },
   callback = function()
     -- arg0: the linter to use, nil to infer from filetype
     -- arg1.cwd: nvim-lint does no magic to determine the cwd for the command, and will
@@ -166,14 +163,15 @@ vim.api.nvim_create_user_command('ESLint', function()
   vim.cmd('silent! lua require("lint").try_lint("eslint_d", { cwd = vim.fs.root(0, { "eslint.config.mjs", "package.json" }) })')
 end, { desc = 'Run eslint_d' })
 
-require'conform'.setup {
+require('conform').setup {
   formatters_by_ft = {
-    javascript = { "prettierd" },
-    typescript = { "prettierd" },
-    typescriptreact = { "prettierd" },
-    javascriptreact = { "prettierd" },
-    css = { "prettierd" },
-    ruby = { "prettierd" },
+    lua = { 'stylua' },
+    javascript = { 'prettierd' },
+    typescript = { 'prettierd' },
+    typescriptreact = { 'prettierd' },
+    javascriptreact = { 'prettierd' },
+    css = { 'prettierd' },
+    ruby = { 'prettierd' },
   },
   format_on_save = {
     -- These options will be passed to conform.format()
@@ -182,13 +180,13 @@ require'conform'.setup {
   },
 }
 vim.api.nvim_create_user_command('Format', function()
-  require('conform').format({ lsp_fallback = false, timeout_ms = 1000 })
+  require('conform').format { lsp_fallback = false, timeout_ms = 1000 }
 end, { desc = 'Use eslint_d to run eslint --fix' })
 vim.api.nvim_create_user_command('ESLintFix', function()
-  require('conform').format({ formatters = { 'eslint_d' }, timeout_ms = 5000 })
+  require('conform').format { formatters = { 'eslint_d' }, timeout_ms = 5000 }
 end, { desc = 'Use eslint_d to run eslint --fix' })
 
-require'gitsigns'.setup {
+require('gitsigns').setup {
   on_attach = function(bufnr)
     local gitsigns = require('gitsigns')
 
@@ -201,14 +199,14 @@ require'gitsigns'.setup {
     -- Navigation
     map('n', ']c', function()
       if vim.wo.diff then
-        vim.cmd.normal({']c', bang = true})
+        vim.cmd.normal { ']c', bang = true }
       else
         gitsigns.nav_hunk('next')
       end
     end)
     map('n', '[c', function()
       if vim.wo.diff then
-        vim.cmd.normal({'[c', bang = true})
+        vim.cmd.normal { '[c', bang = true }
       else
         gitsigns.nav_hunk('prev')
       end
@@ -218,12 +216,13 @@ require'gitsigns'.setup {
     map('n', '<leader>hp', gitsigns.preview_hunk)
     map('n', '<leader>hi', gitsigns.preview_hunk_inline)
     map('n', '<leader>hb', function()
-      gitsigns.blame_line({ full = true })
+      gitsigns.blame_line { full = true }
     end)
     map('n', '<leader>hB', gitsigns.blame)
     map('n', '<leader>hd', gitsigns.diffthis)
-    map('n', '<leader>hQ', function() gitsigns.setqflist('all') end)
+    map('n', '<leader>hQ', function()
+      gitsigns.setqflist('all')
+    end)
     map('n', '<leader>hq', gitsigns.setqflist)
-  end
+  end,
 }
-
