@@ -110,13 +110,24 @@ require'nvim-treesitter.configs'.setup {
 }
 
 require('blink.cmp').setup {
-  keymap = { preset = 'super-tab' },
+  keymap = {
+    preset = 'super-tab',
+    ['<C-k>'] = { 'select_prev', 'fallback' },
+    ['<C-j>'] = { 'select_next', 'fallback' },
+  },
   appearance = {
     nerd_font_variant = 'mono'
   },
   completion = {
     documentation = {
-      auto_show = true,
+      auto_show = false,
+    },
+    menu = {
+      auto_show = false,
+      draw = {
+        -- add the completion source to the menu, e.g. "Buffer" or "LSP"
+        columns = { { 'kind_icon' }, { 'label', 'label_description', gap = 1 }, { 'source_name' } },
+      },
     },
   },
   sources = {
