@@ -5,6 +5,8 @@ local function install_plugins()
   Plug('neovim/nvim-lspconfig')
   Plug('nvim-treesitter/nvim-treesitter', { ['branch'] = 'master', ['build'] = ':TSUpdate' })
 
+  Plug('github/copilot.vim')
+
   -- use a release tag to download pre-built binaries.
   Plug('saghen/blink.cmp', { ['tag'] = 'v1.*' })
 
@@ -143,6 +145,9 @@ require('blink.cmp').setup {
     max_typos = 0,
   },
 }
+-- vim.lsp.config('ts_ls', {
+-- capabilities = require('blink.cmp').get_lsp_capabilities(),
+-- })
 -- Blink sets this highlight link:
 -- :hi BlinkCmpMenuSelection
 -- BlinkCmpMenuSelection xxx links to PmenuSel
@@ -150,6 +155,28 @@ require('blink.cmp').setup {
 vim.api.nvim_create_autocmd('ColorScheme', {
   callback = function()
     vim.api.nvim_set_hl(0, 'BlinkCmpMenuSelection', { link = 'PmenuSel' })
+  end,
+})
+local function copilot_blink_compat()
+  vim.g.copilot_no_maps = true
+  -- C-l accepts a Copilot suggestion, blink uses Tab
+  vim.keymap.set('i', '<C-l>', 'copilot#Accept()', { expr = true, replace_keycodes = false })
+  -- vim.keymap.set('i', '<Tab>', 'copilot#Accept()', { expr = true, replace_keycodes = false })
+end
+copilot_blink_compat()
+-- Experiment
+local copilot_disabled = false
+vim.api.nvim_create_autocmd({ 'InsertEnter', 'CursorMovedI' }, {
+  callback = function()
+    local line = vim.api.nvim_get_current_line():match('^%s*(.*)')
+    local in_comment = line:match('^//') or line:match('^%*') or line:match('^/%*')
+    if in_comment and not copilot_disabled then
+      vim.cmd('Copilot disable')
+      copilot_disabled = true
+    elseif not in_comment and copilot_disabled then
+      vim.cmd('Copilot enable')
+      copilot_disabled = false
+    end
   end,
 })
 
