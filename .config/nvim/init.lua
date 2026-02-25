@@ -44,7 +44,7 @@ require('everforest').setup {
   ui_contrast = 'high',
 }
 
-vim.cmd('colorscheme kanagawa')
+vim.cmd('colorscheme retrobox')
 
 require('mason').setup()
 
@@ -77,13 +77,13 @@ vim.api.nvim_create_autocmd('LspAttach', { callback = on_attach })
 -- ~/.local/share/nvim/plugged/nvim-lspconfig/lsp/<name>.lua
 -- my configs in ./lsp/<name>.lua
 vim.lsp.enable('bashls')
-vim.lsp.enable('clangd')
 vim.lsp.enable('gopls')
 vim.lsp.enable('jsonls')
 vim.lsp.enable('lua_ls')
 vim.lsp.enable('ruby_lsp')
 vim.lsp.enable('sorbet')
-vim.lsp.enable('ts_ls')
+-- vim.lsp.enable('ts_ls')
+vim.lsp.enable('tsgo')
 vim.lsp.enable('vimls')
 vim.lsp.enable('yamlls')
 
@@ -117,10 +117,18 @@ require('blink.cmp').setup {
   },
   completion = {
     documentation = {
-      auto_show = false,
+      auto_show = true,
+      auto_show_delay_ms = 500,
+    },
+    list = {
+      selection = {
+        preselect = true,
+        auto_insert = false,
+      },
     },
     menu = {
-      auto_show = false,
+      auto_show = true,
+      auto_show_delay_ms = 250,
       draw = {
         -- add the completion source to the menu, e.g. "Buffer" or "LSP"
         columns = { { 'kind_icon' }, { 'label', 'label_description', gap = 1 }, { 'source_name' } },
@@ -132,11 +140,17 @@ require('blink.cmp').setup {
   },
   fuzzy = {
     implementation = 'prefer_rust_with_warning',
-    use_typo_resistance = false,
+    max_typos = 0,
   },
 }
-vim.lsp.config('ts_ls', {
-  capabilities = require('blink.cmp').get_lsp_capabilities(),
+-- Blink sets this highlight link:
+-- :hi BlinkCmpMenuSelection
+-- BlinkCmpMenuSelection xxx links to PmenuSel
+-- But switching colorschemes clears the link, so put it back with an autocmd
+vim.api.nvim_create_autocmd('ColorScheme', {
+  callback = function()
+    vim.api.nvim_set_hl(0, 'BlinkCmpMenuSelection', { link = 'PmenuSel' })
+  end,
 })
 
 vim.env.ESLINT_D_PPID = vim.fn.getpid()
@@ -160,7 +174,9 @@ vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
 vim.api.nvim_create_user_command('ESLint', function()
   -- nvim-lint has a bug: it prints the cd operations when it changes to handle the passed cwd,
   -- so this is a workaround to silence it
-  vim.cmd('silent! lua require("lint").try_lint("eslint_d", { cwd = vim.fs.root(0, { "eslint.config.mjs", "package.json" }) })')
+  vim.cmd(
+    'silent! lua require("lint").try_lint("eslint_d", { cwd = vim.fs.root(0, { "eslint.config.mjs", "package.json" }) })'
+  )
 end, { desc = 'Run eslint_d' })
 
 require('conform').setup {
