@@ -118,10 +118,14 @@ fco() {
 
 # fuzzy search a job to foreground
 fj() {
-  local joblines jobnum
-  joblines=$(jobs | fzf +m --layout=reverse --info=inline-right --border --height=10%) &&
+  local joblines jobnum tmp
+  tmp=$(mktemp) || return
+  # use a tmp file; can't pipe because this launches a subshell with its own job table
+  jobs > "$tmp"
+  joblines=$(fzf +m --layout=reverse --info=inline-right --border --height=10% < "$tmp") &&
     jobnum=$(echo "$joblines" | sed -nr "s/\[([0-9]+).*$/\1/p") &&
     fg "%$jobnum"
+  rm -f "$tmp"
 }
 
 # git log (preview commits)
