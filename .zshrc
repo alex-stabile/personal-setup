@@ -133,6 +133,12 @@ flog() {
   git log --color=always --pretty=format:'%h %Cgreen%al%Cred%d %Creset%s' | fzf --preview 'git show --color=always {+1}'
 }
 
+# git restack: build a rebase --onto command and load it into the shell buffer
+restack() {
+  local cmd
+  cmd=$(./scripts/git-restack.sh) && [[ -n "$cmd" ]] && print -z "$cmd"
+}
+
 # ZSH config
 
 autoload -Uz compinit
