@@ -88,6 +88,7 @@ vim.lsp.enable('sorbet')
 vim.lsp.enable('tsgo')
 vim.lsp.enable('vimls')
 vim.lsp.enable('yamlls')
+vim.lsp.enable('clangd')
 
 -- Load custom :References command to integrate fzf + lsp
 require('fzf-lsp-references')
