@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 
 RUN apt-get update && apt-get install -y \
-  zsh git curl tree ripgrep neovim stow bat
+  zsh git curl tree ripgrep neovim stow bat tmux
 
 # Install fzf from tarball since apt-get version is very old
 ARG FZF_VERSION=0.62.0

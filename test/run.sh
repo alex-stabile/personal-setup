@@ -6,7 +6,7 @@ DOCKERFILE="./test/Dockerfile"
 
 if [[ "${1:-}" == "--build" ]]; then
   echo "Building image: $IMAGE"
-  docker buildx -t "$IMAGE" -f "$DOCKERFILE" .
+  docker build -t "$IMAGE" -f "$DOCKERFILE" .
 fi
 
 docker run --rm -it \
