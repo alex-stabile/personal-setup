@@ -1,6 +1,6 @@
 .config/karabiner/automatic_backups
-.vim/plugged
-.vim/.netrwhist
+vim/.vim/plugged
+vim/.vim/.netrwhist
 .gitconfig
 .DS_STORE
 *.swp

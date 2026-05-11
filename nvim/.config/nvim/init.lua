@@ -33,7 +33,7 @@ vim.o.background = 'dark'
 -- float window style
 vim.o.winborder = 'bold'
 -- everything else
--- vim.cmd('source ' .. vim.fn.expand('<sfile>:p:h') .. '/../../.vim/setup.vim')
+vim.cmd('source ' .. vim.fn.expand('<sfile>:p:h') .. '/../../../vim/.vim/setup.vim')
 
 require('kanagawa').setup {
   undercurl = false,
