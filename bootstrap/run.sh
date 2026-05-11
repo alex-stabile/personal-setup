@@ -2,8 +2,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# absolute path to personal-setup repo
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# must do this before zsh
-"$SCRIPT_DIR/strap-fzf.sh"
-"$SCRIPT_DIR/strap-zsh.sh"
-"$SCRIPT_DIR/strap-tmux.sh"
+stow --dir "$REPO_DIR" --target $HOME zsh tmux nvim
+
