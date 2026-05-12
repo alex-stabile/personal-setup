@@ -1,4 +1,5 @@
 .config/karabiner/automatic_backups
+karabiner/.config/karabiner/automatic_backups
 vim/.vim/plugged
 vim/.vim/.netrwhist
 .gitconfig
