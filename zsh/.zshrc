@@ -20,6 +20,10 @@ alias tat='tmux attach-session -t'
 
 alias weather="curl wttr.in/SanFrancisco"
 
+# On Debian/Ubuntu bat is packaged as batcat, on macOS it's bat.
+# Standardize on batcat.
+command -v batcat > /dev/null || alias batcat='bat'
+
 # Colors (from default bashrc)
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -68,14 +72,16 @@ bindkey '^B' branch_expand_widget
 if command -v fzf > /dev/null; then
   local preview_bind="ctrl-d:preview-page-down,ctrl-e:preview-down,ctrl-u:preview-page-up,ctrl-y:preview-up"
   export FZF_DEFAULT_OPTS="--bind=$preview_bind"
-  export FZF_COMPLETION_OPTS='--preview="bat --style=numbers,grid --color=always --line-range :300 {} 2>/dev/null || tree -L 2 -C {}"'
-  export FZF_CTRL_T_OPTS='--tmux --preview="bat --style=numbers,grid --color=always --line-range :300 {} 2>/dev/null || tree -L 2 -C {}"'
-  # Set up fzf key bindings and fuzzy completion
-  source <(fzf --zsh)
+  export FZF_COMPLETION_OPTS='--preview="batcat --style=numbers,grid --color=always --line-range :300 {} 2>/dev/null || tree -L 2 -C {}"'
+  export FZF_CTRL_T_OPTS='--tmux --preview="batcat --style=numbers,grid --color=always --line-range :300 {} 2>/dev/null || tree -L 2 -C {}"'
+  # Set up fzf key bindings and fuzzy completion (requires fzf >= 0.48)
+  if fzf --zsh >/dev/null 2>&1; then
+    source <(fzf --zsh)
+  fi
 fi
 
 # Example command to preview file or folder:
-# --preview="(bat --color=always --style=header,grid --line-range :300 {} || tree -aC -L 1 {}) 2>/dev/null"
+# --preview="(batcat --color=always --style=header,grid --line-range :300 {} || tree -aC -L 1 {}) 2>/dev/null"
 
 # Custom FZF functions
 
@@ -135,8 +141,9 @@ flog() {
 
 # git restack: build a rebase --onto command and load it into the shell buffer
 restack() {
+  local script_dir="${${(%):-%x}:A:h}"
   local cmd
-  cmd=$(./scripts/git-restack.sh) && [[ -n "$cmd" ]] && print -z "$cmd"
+  cmd=$("$script_dir/lib/git-restack.sh") && [[ -n "$cmd" ]] && print -z "$cmd"
 }
 
 # ZSH config
