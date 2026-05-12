@@ -1,12 +1,16 @@
 FROM ubuntu:22.04
 
 RUN apt-get update && apt-get install -y \
-  zsh git curl tree ripgrep stow bat tmux
+  zsh git curl tree ripgrep stow bat tmux gcc
 
 # Install fzf from tarball since apt-get version is very old
 ARG FZF_VERSION=0.62.0
 RUN curl -fsSL "https://github.com/junegunn/fzf/releases/download/v${FZF_VERSION}/fzf-${FZF_VERSION}-linux_arm64.tar.gz" \
     | tar -xz -C /usr/local/bin
+
+# Install vim-plug
+RUN curl -fLo /root/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+      https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 # Install neovim from tarball since apt-get version is way too old (no winborder, etc.)
 ARG NVIM_VERSION=0.11.6
