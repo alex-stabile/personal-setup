@@ -143,7 +143,7 @@ flog() {
 restack() {
   local script_dir="${${(%):-%x}:A:h}"
   local cmd
-  cmd=$("$script_dir/scripts/git-restack.sh") && [[ -n "$cmd" ]] && print -z "$cmd"
+  cmd=$("$script_dir/lib/git-restack.sh") && [[ -n "$cmd" ]] && print -z "$cmd"
 }
 
 # ZSH config
@@ -202,6 +202,3 @@ setopt LIST_PACKED
 setopt AUTO_MENU
 zstyle ':completion:*:*:*:*:descriptions' format '%F{green}-- %d --%f'
 zstyle ':completion:*' menu select
-
-# Prompt
-source ~/lib/prompt.zsh
